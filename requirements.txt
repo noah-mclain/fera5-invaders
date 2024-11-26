@@ -3,4 +3,4 @@ numpy==1.23.1
 tensorflow==1.20.0
 torch==1.12.1
 matplotlib==3.5.1
-acikit-learn==1.1.2
+scikit-learn==1.1.2
