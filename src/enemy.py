@@ -1,0 +1,1 @@
+# Enemy class for chicken behavior

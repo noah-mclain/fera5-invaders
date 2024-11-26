@@ -1,0 +1,1 @@
+# Laser class for shooting mechanics

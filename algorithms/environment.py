@@ -1,0 +1,1 @@
+# Wrapper to connect the game with the AI
