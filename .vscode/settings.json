@@ -1,4 +1,14 @@
 {
   "workbench.colorTheme": "Bearded Theme Aquarelle Lilac",
-  "cSpell.words": ["fera", "gameplay", "matplotlib", "numpy", "scikit"]
+  "cSpell.words": [
+    "cygdrive",
+    "cygpath",
+    "fera",
+    "gameplay",
+    "matplotlib",
+    "MSYS",
+    "numpy",
+    "scikit",
+    "venv"
+  ]
 }

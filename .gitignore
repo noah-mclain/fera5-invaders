@@ -1,1 +1,7 @@
-.env/
+# Ignore Python virtual environments
+*.env/
+*.venv/
+*venv/
+
+# Ignore other specific directories
+.yay/
