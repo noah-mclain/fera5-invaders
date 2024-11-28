@@ -1,1 +1,3 @@
 # Laser class for shooting mechanics
+def __init__():
+    ...
