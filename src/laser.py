@@ -1,8 +1,10 @@
 import pygame
+from os import path
 # Laser class for shooting mechanics
 class Laser():
     def __init__(self, x, y):
-        self.image = pygame.image.load("assets/images/bullet/a1.png")
+        image_path = path.join("assets", "images", "bullet", "a1.png")
+        self.image = pygame.image.load(image_path)
         self.rect = self.image.get_rect()
         self.rect.centerx = x
         self.rect.centery = y + 5

@@ -1,11 +1,13 @@
 # Enemy class for chicken behavior
 import pygame
+from os import path
 class Chicken:
 
     chicken_counter=0
     
     def __init__(self,x,y) -> None:
-        image=pygame.image.load('assets/images/Enemy/chiken.png')
+        image_path = path.join("assets","images","Enemy", "chiken.png") 
+        image=pygame.image.load(image_path)
         self.width = 50
         self.height = 50
         self.image = pygame.transform.scale(image, (self.width, self.height))
@@ -42,7 +44,8 @@ class Chicken:
 
     def killChicken(self):   
         if self.isChickenAlive:
-            death_image = pygame.image.load('assets/images/Enemy/dead.png')
+            death_image_path = path.join("assets","images","Enemy","dead.png")
+            death_image = pygame.image.load(death_image_path)
             self.image = pygame.transform.scale(death_image, (50, 50))
             Chicken.chicken_counter-=1
             self.isChickenAlive=False
@@ -54,4 +57,3 @@ class Chicken:
 
     def layEggs():
         pass
-
