@@ -10,67 +10,84 @@ from laser import Laser
 
 class Game:
     def __init__(self):
-        # Initializing game variables
-        self.running = True
+        # Initialize pygame
+        pygame.init()
         
         # Get current dimensions
         info = pygame.display.info()
         self.screen_width = info.current_w
         self.screen_height = info.current_h
         
-        self.score = 0
-        
-        # Initialize pygame
-        pygame.init()
-        
-        self.screen = pygame.display.set.set_mode((self.screen_width, self.screen_height))
+        # Create screen
+        self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
         pygame.display.set_caption("Fera5 Invaders")
         
+        self.running = True
+        self.score = 0
+
         # Creating Player instance
-        self.player = Player()
+        self.player = Player(self.screen_width // 2, self.screen_height - 100)
         
         # Creating Enemies
         self.num_of_enemies = 6
-        self.enemies = [Enemy(random.randint(0, self.screen_width - 64), random.randin(50, 150)) for _ in range(self.num_of_enemies)]
+        self.enemies = [
+                Enemy(
+                    random.randint(0, self.screen_width - 64), 
+                    random.randin(50, 150)
+                ) for _ in range(self.num_of_enemies)
+            ]
         
-        # Setting up Bullets
-        self.laser = Laser()
+    def check_collisions(self):
+        # Check laser collisions with enemies 
+        for enemy in self.enemies[:]:
+            for laser in self.player.lasers[:]:
+                if laser.rect.colliderect(enemy.rect):
+                    laser.engage()
+                    enemy.die()
+                    self.score += 100
+                    self.enemies.remove(enemy)
+                    break
+                        
+    def run(self):
+        clock = pygame.time.Clock() # To keep the framerate consistent
         
-        def run(self):
-            while self.running:
-                self.screen.fill((0, 0, 0))
+        while self.running:
+            clock.tick(60) # FPS limit (can change later)
+            self.screen.fill((0, 0, 0))
+            
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    self.running = False
                 
-                for event in pygame.event.get():
-                    if event.type == pygame.QUIT:
-                        self.running = False
-                    
-                    if event.type == pygame.KEYDOWN:
-                        if event.key == pygame.K_LEFT:
-                            self.player.move(-3.7)
-                        if event.key == pygame.K_RIGHT:
-                            self.player.move(3.7)
-                        if event.key == pygame.K_SPACE:
-                            if not self.laser.if_fired:
-                                self.laser.fire(self.player.x, self.player.y)
-                                
-                    if event.types == pygame.KEYUP:
-                        if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
-                            self.player.stop()
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_LEFT:
+                        self.player.move(-3.7)
+                    if event.key == pygame.K_RIGHT:
+                        self.player.move(3.7)
+                    if event.key == pygame.K_SPACE:
+                        self.player.shoot()
                             
-                # Update player position and draw them
-                self.player.update()
-                self.player.draw(self.screen)
+                if event.type == pygame.KEYUP:
+                    if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
+                        self.player.stop()
+                        
+            # Update player position and draw them
+            self.player.update()
+            self.player.draw(self.screen)
+            
+            # Update enemies and draw them
+            for enemy in self.enemies:
+                enemy.update()
+                enemy.draw(self.screen)
                 
-                # Update enemies and draw them
-                for enemy in self.enemies:
-                    enemy.update()
-                    enemy.draw()
-                    
-                # Update and draw laser
-                if self.laser.is_fired:
-                    self.laser.update()
-                    self.laser.draw(self.screen)
-                    
-                pygame.display.update()
-        
-        
+            # Check collisions
+            self.check_collisions
+            
+            # Draw score
+            font = pygame.font.Font(None, 36)
+            score_text = font.render(f'Score: {self.score}', True, (255, 255, 255))
+            self.screen.blit(score_text, (10, 10))
+                
+            pygame.display.flip()
+    
+    
