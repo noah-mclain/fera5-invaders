@@ -4,14 +4,14 @@ import copy
 from laser import Laser
 
 class Player:
-    def __int__(self, x,y):
-        self.image = pygame.image.load("assets\images\ship.png")
+    def __init__(self):
+        self.image = pygame.image.load("assets\\images\\ship.png")
         self.rect = self.image.get_rect()
         info = pygame.display.Info()
-        self.screen.width = info.current_w
-        self.screen.height = info.current_h
-        self.rect.x = self.screen.width /2
-        self.rect.y = self.screen.height - 15
+        self.screen_width = info.current_w
+        self.screen_height = info.current_h
+        self.rect.x = self.screen_width // 2
+        self.rect.y = self.screen_height - 200
         self.speed = 0
         self.max_speed = 5 
         self.alive = True
@@ -44,21 +44,21 @@ class Player:
     def draw(self, screen):
         screen.blit(self.image, self.rect)
         for laser in self.lasers:
-            laser.draw()
+            laser.draw(screen)
     
     def update(self):
         self.rect.x += self.speed
         if self.rect.x < 0:
             self.rect.x = 0
-        elif self.rect.x > self.screen.width - self.rect.width:
-            self.rect.x = self.screen.width - self.rect.width
+        elif self.rect.x > self.screen_width - self.rect.width:
+            self.rect.x = self.screen_width - self.rect.width
         self.fired_lasers()
-        for laser in self.fired_lasers():
+        for laser in self.lasers:
             laser.update()
 
 
     def die(self):
-        self.image = pygame.image.load("assets\images\shipDie.png")
+        self.image = pygame.image.load("assets\\images\\shipDie.png")
         self.alive = False
 
         

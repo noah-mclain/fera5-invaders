@@ -5,7 +5,7 @@ import random
 
 # Class imports
 from player import Player
-from enemy import Enemy
+#from enemy import Enemy
 from laser import Laser
 
 class Game:
@@ -14,7 +14,7 @@ class Game:
         pygame.init()
         
         # Get current dimensions
-        info = pygame.display.info()
+        info = pygame.display.Info()
         self.screen_width = info.current_w
         self.screen_height = info.current_h
         
@@ -26,18 +26,18 @@ class Game:
         self.score = 0
 
         # Creating Player instance
-        self.player = Player(self.screen_width // 2, self.screen_height - 100)
+        self.player = Player()
         
         # Creating Enemies
         self.num_of_enemies = 6
-        self.enemies = [
+        '''self.enemies = [
                 Enemy(
                     random.randint(0, self.screen_width - 64), 
-                    random.randin(50, 150)
+                    random.randint(50, 150)
                 ) for _ in range(self.num_of_enemies)
-            ]
+            ]'''
         
-    def check_collisions(self):
+    '''def check_collisions(self):
         # Check laser collisions with enemies 
         for enemy in self.enemies[:]:
             for laser in self.player.lasers[:]:
@@ -46,7 +46,7 @@ class Game:
                     enemy.die()
                     self.score += 100
                     self.enemies.remove(enemy)
-                    break
+                    break'''
                         
     def run(self):
         clock = pygame.time.Clock() # To keep the framerate consistent
@@ -76,12 +76,12 @@ class Game:
             self.player.draw(self.screen)
             
             # Update enemies and draw them
-            for enemy in self.enemies:
+            '''for enemy in self.enemies:
                 enemy.update()
-                enemy.draw(self.screen)
+                enemy.draw(self.screen)'''
                 
             # Check collisions
-            self.check_collisions
+            #self.check_collisions()
             
             # Draw score
             font = pygame.font.Font(None, 36)
