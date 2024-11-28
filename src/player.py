@@ -5,7 +5,13 @@ from laser import Laser
 
 class Player:
     def __init__(self):
-        self.image = pygame.image.load("assets\\images\\ship.png")
+        image = pygame.image.load("assets/images/ship.png")
+        
+        self.width = 50
+        self.height = 50
+        
+        self.image = pygame.transform.scale(image, (self.width, self.height))
+        
         self.rect = self.image.get_rect()
         info = pygame.display.Info()
         self.screen_width = info.current_w
@@ -58,7 +64,7 @@ class Player:
 
 
     def die(self):
-        self.image = pygame.image.load("assets\\images\\shipDie.png")
+        self.image = pygame.image.load("assets/images/shipDie.png")
         self.alive = False
 
         

@@ -8,7 +8,9 @@ def check_dependencies():
     required_files = [
         "assets/images/ship.png",
         "assets/images/bullet/a1.png",
-        "assets/images/shipDie.png"
+        "assets/images/shipDie.png",
+        "assets/images/Enemy/chiken.png", 
+        "assets/images/Enemy/dead.png"
     ]
     
     for file in required_files:

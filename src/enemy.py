@@ -2,54 +2,55 @@
 import pygame
 class Chicken:
 
-    chickenCounter=0
+    chicken_counter=0
     
     def __init__(self,x,y) -> None:
-        self.image=pygame.image.load('/assets/images/Enemy/chiken.png')
-        self.x=x
-        self.y=y
+        image=pygame.image.load('assets/images/Enemy/chiken.png')
+        self.width = 50
+        self.height = 50
+        self.image = pygame.transform.scale(image, (self.width, self.height))
         self.isChickenAlive=True
-        self.rect=self.image.get_rect(top_left=(x,y))
-        chickenCounter+=1
-
-
-    # def moveLeft(self,left):
-    #     self.x-=left
-    #     self.rect.x=self.x
+        self.rect=self.image.get_rect(topleft=(x,y))
+        Chicken.chicken_counter+=1
         
-
-    # def moveRight(self,right):
-    #     self.x+=right
-    #     self.rect.x=self.x
+        self.speed_x = 2
+        self.direction = 1
        
     
     def draw(self,screen):
-        screen.blit(self.image,self.rect)
+        if self.isChickenAlive:
+            screen.blit(self.image,self.rect)
+
+    def update(self, screenWidth,screenHeight):
+        if not self.isChickenAlive:
+            return
         
+        self.rect.x += self.speed_x * self.direction
         
-        
-    def update(self,xChange,yChange,screenWidth,screenHeight):
-        self.rect.x+=xChange
-        self.rect.y+=yChange
-        
-        if self.rect.x<0 : 
-            self.rect.x=0
-        elif self.rect.x>screenWidth-self.rect.x:
-            self.rect.x=screenWidth
+        if self.rect.left <= 0:
+            self.direction =1
+            self.rect.y += 20
+        elif self.rect.right >= screenWidth:
+            self.direction = -1
+            self.rect.y += 20
             
-        if self.rect.y<0: 
-            self.rect.y=0
-        elif self.rect.y>screenHeight- self.rect.y:
-            self.rect.y=screenHeight
+        if self.rect.top < 0:
+            self.rect.top = 0
+        if self.rect.bottom > screenHeight:
+            self.rect.bottom = screenHeight
         
 
     def killChicken(self):   
-        self.image=pygame.image.load('/assets/images/Enemy/dead.png') 
-        chickenCounter-=1
-        self.isChickenAlive=False
+        if self.isChickenAlive:
+            death_image = pygame.image.load('assets/images/Enemy/dead.png')
+            self.image = pygame.transform.scale(death_image, (50, 50))
+            Chicken.chicken_counter-=1
+            self.isChickenAlive=False
 
     # def __del__(self): # to kill the chicken
-            
+    @staticmethod
+    def get_chicken_count():
+        return Chicken.chicken_counter
 
     def layEggs():
         pass
