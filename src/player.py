@@ -5,7 +5,8 @@ from laser import Laser
 
 class Player:
     def __init__(self):
-        self.image = pygame.image.load("assets\\images\\ship.png")
+        image = pygame.image.load("assets\\images\\ship.png")
+        self.image= pygame.transform.scale(image, (50,50))
         self.rect = self.image.get_rect()
         info = pygame.display.Info()
         self.screen_width = info.current_w

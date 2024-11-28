@@ -5,7 +5,7 @@ import random
 
 # Class imports
 from player import Player
-#from enemy import Enemy
+from enemy import Chicken
 from laser import Laser
 
 class Game:
@@ -30,14 +30,14 @@ class Game:
         
         # Creating Enemies
         self.num_of_enemies = 6
-        '''self.enemies = [
-                Enemy(
+        self.enemies = [
+                Chicken(
                     random.randint(0, self.screen_width - 64), 
                     random.randint(50, 150)
                 ) for _ in range(self.num_of_enemies)
-            ]'''
+            ]
         
-    '''def check_collisions(self):
+    def check_collisions(self):
         # Check laser collisions with enemies 
         for enemy in self.enemies[:]:
             for laser in self.player.lasers[:]:
@@ -46,7 +46,7 @@ class Game:
                     enemy.die()
                     self.score += 100
                     self.enemies.remove(enemy)
-                    break'''
+                    break
                         
     def run(self):
         clock = pygame.time.Clock() # To keep the framerate consistent
@@ -76,12 +76,12 @@ class Game:
             self.player.draw(self.screen)
             
             # Update enemies and draw them
-            '''for enemy in self.enemies:
+            for enemy in self.enemies:
                 enemy.update()
-                enemy.draw(self.screen)'''
+                enemy.draw(self.screen)
                 
             # Check collisions
-            #self.check_collisions()
+            self.check_collisions()
             
             # Draw score
             font = pygame.font.Font(None, 36)
