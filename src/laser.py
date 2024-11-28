@@ -13,7 +13,7 @@ class Laser():
     def draw(self, screen):
         screen.blit(self.image, self.rect)
 
-    def update(self, screen):
+    def update(self):
         self.rect.y += self.speed
         if self.rect.y > 0 or self.is_engaged:
             self.die()

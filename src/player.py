@@ -1,5 +1,6 @@
 # Player class managing player actions
 import pygame
+import copy
 from laser import Laser
 
 class Player:
@@ -14,11 +15,22 @@ class Player:
         self.speed = 0
         self.max_speed = 5 
         self.alive = True
+        self.lasers = []
 
 
     def shoot(self):
         laser = Laser(self.rect.x, self.rect.y)
         laser.fire()
+        self.lasers.append(laser)
+    
+    def fired_lasers(self):
+        new_lasers = []
+        for laser in self.lasers:
+            if laser.is_fired == True:
+                new_lasers.append(laser)
+        self.lasers = new_lasers
+        
+
 
     # player movement
     def move(self,change):
@@ -31,6 +43,8 @@ class Player:
     # drawing the player ship
     def draw(self, screen):
         screen.blit(self.image, self.rect)
+        for laser in self.lasers:
+            laser.draw()
     
     def update(self):
         self.rect.x += self.speed
@@ -38,6 +52,10 @@ class Player:
             self.rect.x = 0
         elif self.rect.x > self.screen.width - self.rect.width:
             self.rect.x = self.screen.width - self.rect.width
+        self.fired_lasers()
+        for laser in self.fired_lasers():
+            laser.update()
+
 
     def die(self):
         self.image = pygame.image.load("assets\images\shipDie.png")
