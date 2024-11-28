@@ -7,6 +7,9 @@ class Laser():
         self.rect.centerx = x
         self.rect.centery = y + 5
         self.speed = -5
+        self.rect.centerx = x
+        self.rect.centery = y + 5
+        self.speed = -5
         self.is_fired = False
         self.is_engaged = False
 
@@ -14,9 +17,6 @@ class Laser():
         screen.blit(self.image, self.rect)
 
     def update(self):
-        if not self.is_fired:
-            return
-        
         self.rect.y += self.speed
         if self.rect.bottom < 0 or self.is_engaged:
             self.die()
