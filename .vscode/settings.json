@@ -2,7 +2,11 @@
   "workbench.colorTheme": "Bearded Theme Aquarelle Lilac",
   "cSpell.words": [
     "blit",
+    "centerx",
+    "centery",
+    "chiken",
     "colliderect",
+    "cooldown",
     "cygdrive",
     "cygpath",
     "fera",
@@ -12,6 +16,8 @@
     "MSYS",
     "numpy",
     "scikit",
+    "Spritnimation",
+    "SRCALPHA",
     "venv"
   ]
 }

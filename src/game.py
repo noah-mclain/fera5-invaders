@@ -6,36 +6,51 @@ import random
 # Class imports
 from player import Player
 from enemy import Chicken
-from laser import Laser
+from environment.sprite import Sprite
 
 class Game:
     def __init__(self):
         # Initialize pygame
         pygame.init()
         
-        # Get current dimensions
-        info = pygame.display.Info()
-        self.screen_width = info.current_w
-        self.screen_height = info.current_h
-        
-        # Create screen
-        self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
-        pygame.display.set_caption("Fera5 Invaders")
-        
-        self.running = True
-        self.score = 0
+        try:
+            # Get current dimensions
+            info = pygame.display.Info()
+            self.screen_width = min(info.current_w, 1920)  # Cap at reasonable size
+            self.screen_height = min(info.current_h, 1080)
+            
+            # Create screen with fallback
+            try:
+                self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
+            except pygame.error:
+                print("Failed to create full-screen window, trying windowed mode")
+                self.screen_width = 1280
+                self.screen_height = 720
+                self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
+                
+            pygame.display.set_caption("Fera5 Invaders")
+            
+            self.running = True
+            self.score = 0
 
-        # Creating Player instance
-        self.player = Player()
-        
-        # Creating Enemies
-        self.num_of_enemies = 6
-        self.enemies = []
-        for i in range(self.num_of_enemies):
-            x = (i % 3) * 200 + 100
-            y = (i // 3) * 100 + 50
-            self.enemies.append(Chicken(x, y))
-        
+            # Create game objects
+            self.player = Player()
+            self.enemies = []
+            
+            # Create enemies with error handling
+            self.num_of_enemies = 6
+            for i in range(self.num_of_enemies):
+                try:
+                    x = (i % 3) * 200 + 100
+                    y = (i // 3) * 100 + 50
+                    self.enemies.append(Chicken(x, y))
+                except Exception as e:
+                    print(f"Failed to create enemy {i}: {e}")
+                    
+        except Exception as e:
+            print(f"Game initialization error: {e}")
+            raise
+    
     def check_collisions(self):
         # Check laser collisions with enemies 
         for enemy in self.enemies[:]:

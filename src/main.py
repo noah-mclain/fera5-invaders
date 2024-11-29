@@ -9,7 +9,7 @@ def check_dependencies():
         "assets/images/ship.png",
         "assets/images/bullet/a1.png",
         "assets/images/shipDie.png",
-        "assets/images/Enemy/chiken.png", 
+        "assets/images/Enemy/chickenRed.png", 
         "assets/images/Enemy/dead.png"
     ]
     
@@ -22,28 +22,33 @@ def check_dependencies():
     return True
 
 def main():
-    # Check if all required files exist
-    if not check_dependencies():
-        print("Missing required files. Please ensure all assets are in place.")
-        sys.exit(1)
-
     try:
-        # Initialize pygame
+        print("Checking dependencies...")
+        if not check_dependencies():
+            print("Missing required files. Please ensure all assets are in place.")
+            sys.exit(1)
+
+        print("Initializing pygame...")
         pygame.init()
         
-        # Set up display
+        print("Setting up display...")
         pygame.display.init()
         
-        # Create and run game
+        print("Creating game...")
         game = Game()
+        print("Game created successfully")
+        
+        print("Running game...")
         game.run()
         
     except pygame.error as e:
         print(f"Pygame error occurred: {e}")
     except Exception as e:
         print(f"An unexpected error occurred: {e}")
+        import traceback
+        traceback.print_exc()
     finally:
-        # Clean up
+        print("Quitting pygame...")
         pygame.quit()
         sys.exit()
 

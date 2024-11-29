@@ -9,9 +9,6 @@ class Laser():
         self.rect.centerx = x
         self.rect.centery = y + 5
         self.speed = -5
-        self.rect.centerx = x
-        self.rect.centery = y + 5
-        self.speed = -5
         self.is_fired = False
         self.is_engaged = False
 

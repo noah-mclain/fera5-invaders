@@ -9,7 +9,7 @@ class Egg:
         self.width=10
         self.height=10
         self.image = pygame.transform.scale(image, (self.width, self.height))
-        self.rect=self.get_rect(topleft=(x,y))
+        self.rect=self.image.get_rect(topleft=(x,y))
         self.speedY=2
         
 
