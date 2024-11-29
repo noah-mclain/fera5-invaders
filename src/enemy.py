@@ -1,6 +1,7 @@
 # Enemy class for chicken behavior
 import pygame
 from os import path
+from egg import Egg
 class Chicken:
 
     chicken_counter=0
@@ -57,3 +58,9 @@ class Chicken:
 
     def layEggs():
         pass
+    def layEggs(self):
+        eggX= self.rect.centerx
+        eggY=self.rect.bottom
+        return Egg(eggX,eggY)
+        
+
