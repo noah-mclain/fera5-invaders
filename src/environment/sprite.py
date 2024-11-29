@@ -1,23 +1,20 @@
-# Sprite class to handle sprite functions
 import pygame
+from os import path
 
-class Drawable:
-    """Base class for drawable objects"""
-    pass
-
-class Sprite(Drawable):
-    """Static sprite class"""
-    def __init__(self):
-        self.x = 0
-        self.y = 0
-        self.image = None
-    
-    def draw(self, context, camera=None):
-        if camera:
-            context.blit(self.image, (self.x - camera.x, self.y - camera.y))
-        else:
-            context.blit(self.image, (self.x, self.y))
-
-
-
-
+class StaticSprite(pygame.sprite.Sprite):
+    def __init__(self, image_path, position, size=None):
+        super().__init__()
+        
+        # Load the image
+        self.image = pygame.image.load(image_path).convert_alpha()
+        
+        # Scale if size is provided
+        if size:
+            self.image = pygame.transform.scale(self.image, size)
+            
+        # Set up rect
+        self.rect = self.image.get_rect(topleft=position)
+        
+    def update(self):
+        # Static sprites don't need animation updates
+        pass

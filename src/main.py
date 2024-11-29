@@ -22,11 +22,12 @@ def check_dependencies():
     return True
 
 def main():
+    game = None
     try:
         print("Checking dependencies...")
         if not check_dependencies():
             print("Missing required files. Please ensure all assets are in place.")
-            sys.exit(1)
+            return
 
         print("Initializing pygame...")
         pygame.init()
@@ -39,16 +40,18 @@ def main():
         print("Game created successfully")
         
         print("Running game...")
-        game.run()
+        if game:
+            game.run()
         
     except pygame.error as e:
-        print(f"Pygame error occurred: {e}")
+        print(f"Pygame error occurred: {str(e)}")
     except Exception as e:
-        print(f"An unexpected error occurred: {e}")
+        print(f"An unexpected error occurred: {str(e)}")
         import traceback
         traceback.print_exc()
     finally:
-        print("Quitting pygame...")
+        if game:
+            game.running = False
         pygame.quit()
         sys.exit()
 

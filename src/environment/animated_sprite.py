@@ -1,88 +1,184 @@
-from environment.frame_sprite import FrameSprite
+import pygame
+import random
+from environment.sprite_sheet import SpriteSheet
 from environment.animation_sequence import AnimationSequence
 
-class AnimatedSprite(FrameSprite):
-    """Sprite that can be animated."""
-    def __init__(self):
+class AnimatedSprite(pygame.sprite.Sprite):
+    def __init__(self, position, sprite_sheet_path, sprite_type="chicken"):
         super().__init__()
-        self.last_elapsed = 0
-        self.frames_per_second = 20  # Frames per second
-        self.current_sequence = None
-        self.playing = False
-        self.looping = False
-        self.sequences = {}
+        
+        # Load sprite sheet
+        self.sprite_sheet_image = pygame.image.load(sprite_sheet_path).convert_alpha()
+        self.sprite_sheet = SpriteSheet(self.sprite_sheet_image)
+        
+        # Extract all frames
+        self.frames = {}
+        self.load_frames(sprite_type)
+        
+        # Set up animation sequences based on sprite type
+        self.setup_animations(sprite_type)
+        
+        # Set up initial sprite image and rect
+        self.image = self.frames["alive"][0]
+        self.rect = self.image.get_rect(topleft=position)
+        
+        # Track current animation state
+        self.current_animation = None
+        self.previous_animation = None
     
-    def update(self, delta):
-        if not self.playing or not self.current_sequence:
-            return
+    def load_frames(self, sprite_type):
+        # Different frame dimensions for different sprites and their states
+        sprite_data = {
+            "chicken": {
+                "alive": {
+                    "width": 40,
+                    "height": 35,
+                    "frames": list(range(0, 9)),  # frames 0-8
+                    "scale": 1
+                },
+                "dead": {
+                    "width": 50,  # Adjust these dimensions for the dead sprite
+                    "height": 45,
+                    "frames": [10],  # frame 10
+                    "scale": 1
+                },
+                "food": {
+                    "width": 30,  # Adjust these dimensions for the food sprite
+                    "height": 30,
+                    "frames": [11, 12, 13],  # frames 11-13
+                    "scale": 1
+                }
+            },
+            "egg": {
+                "whole": {
+                    "width": 28,
+                    "height": 24,
+                    "frames": [0],
+                    "scale": 1
+                }
+            }
+        }
         
-        # Update time
-        self.last_elapsed += delta
-        frame_duration = 1 / self.frames_per_second
+        data = sprite_data.get(sprite_type)
+        if not data:
+            raise ValueError(f"Unknown sprite type: {sprite_type}")
         
-        if self.last_elapsed < frame_duration:
-            return
-        self.last_elapsed -= frame_duration
-
-        # Move to the next frame in the sequence
-        seq = self.current_sequence
-        current_col = self.frame_x // self.frame_width
-        current_row = self.frame_y // self.frame_height
-
-        # Advance frame
-        current_col += 1
-        if current_col > seq.end_column:
-            current_col = seq.start_column
-            current_row += 1
-            if current_row > seq.end_row:
-                if self.looping:
-                    current_row = seq.start_row
-                else:
-                    self.playing = False
-                    return
-
-        # Update frame coordinates
-        self.frame_x = current_col * self.frame_width
-        self.frame_y = current_row * self.frame_height
-
-    def _is_end_of_sequence(self):
-        """Check if the current frame is the last in the sequence."""
-        seq = self.current_sequence
-        current_col = self.frame_x // self.frame_width
-        current_row = self.frame_y // self.frame_height
-
-        return (
-            current_row > seq.end_row
-            or (current_row == seq.end_row and current_col > seq.end_column)
-        )
-
-    def play_sequence(self, seq_name, loop=False):
-        """Start playing a specific animation sequence."""
-        if seq_name not in self.sequences:
-            raise ValueError(f"Sequence {seq_name} not found.")
+        # Extract frames for each animation state
+        self.frames = {}  # Change to dictionary to store frames by state
         
-        self.current_sequence = self.sequences[seq_name]
-        self.looping = loop
-        self.playing = True
-        self.frame_x = self.current_sequence.start_column * self.frame_width
-        self.frame_y = self.current_sequence.start_row * self.frame_height
+        for state, state_data in data.items():
+            self.frames[state] = []
+            for frame_num in state_data["frames"]:
+                try:
+                    frame = self.sprite_sheet.get_image(
+                        frame=frame_num,
+                        width=state_data["width"],
+                        height=state_data["height"],
+                        scale=state_data["scale"],
+                        color=(0, 0, 0)
+                    )
+                    self.frames[state].append(frame)
+                    print(f"Loaded {state} frame {frame_num}")
+                except Exception as e:
+                    print(f"Error loading {state} frame {frame_num}: {str(e)}")
+                    raise
+    
+    def setup_animations(self, sprite_type):
+        animation_data = {
+            "chicken": {
+                "alive": {"speed": 0.1},
+                "dead": {"speed": 0.5},
+                "food": {"speed": 0.2}
+            },
+            "egg": {
+                "whole": {"speed": 0.1}
+            }
+        }
+        
+        data = animation_data.get(sprite_type)
+        if not data:
+            raise ValueError(f"No animation data for sprite type: {sprite_type}")
+        
+        self.animations = {}
+        
+        for anim_name, anim_info in data.items():
+            try:
+                self.animations[anim_name] = AnimationSequence(
+                    self.frames[anim_name],
+                    animation_speed=anim_info["speed"]
+                )
+            except Exception as e:
+                print(f"Error setting up {anim_name} animation: {str(e)}")
+                raise
+    
+    def play_animation(self, animation_name, loop=True):
+        """Play the specified animation sequence"""
+        if animation_name in self.animations:
+            # Stop the previous animation if it exists
+            if self.current_animation and self.current_animation != animation_name:
+                self.animations[self.current_animation].stop()
+                self.previous_animation = self.current_animation
+            
+            self.current_animation = animation_name
+            self.animations[animation_name].play(loop=loop)
+        else:
+            print(f"Warning: Animation '{animation_name}' not found")
 
-    def stop_playing(self):
-        """Stop the animation."""
-        self.playing = False
+    def stop_animation(self):
+        """Stop the current animation"""
+        if self.current_animation:
+            self.animations[self.current_animation].stop()
+            self.previous_animation = self.current_animation
+            self.current_animation = None
 
-    def set_frame_dimensions(self, width, height):
-        """Set frame width and height."""
-        self.frame_width = width
-        self.frame_height = height
+    def pause_animation(self):
+        """Pause the current animation"""
+        if self.current_animation:
+            self.animations[self.current_animation].pause()
 
-    def set_columns_rows(self, columns, rows):
-        """Set number of columns and rows in the sprite sheet."""
-        self.frame_width = self.image.get_width() // columns
-        self.frame_height = self.image.get_height() // rows
+    def update(self):
+        """Update the sprite's animation"""
+        if self.current_animation:
+            current_anim = self.animations[self.current_animation]
+            if current_anim.is_playing:
+                self.image = current_anim.update(pygame.time.get_ticks())
+            elif not current_anim.loop:
+                # If animation is done and not looping, keep the last frame
+                self.image = current_anim.frames[current_anim.frame_index]
 
-    def add_sequence(self, name, start_row, start_column, end_row, end_column):
-        """Create and add a new animation sequence."""
-        self.sequences[name] = AnimationSequence(
-            start_row, start_column, end_row, end_column
-        )
+# Test the animation
+# if __name__ == "__main__":
+#     pygame.init()
+    
+#     # Set up display
+#     SCREEN_WIDTH = 500
+#     SCREEN_HEIGHT = 500
+#     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+#     pygame.display.set_caption('Animated Sprite')
+    
+#     # Create sprite and sprite group
+#     sprite_group = pygame.sprite.Group()
+#     animated_sprite = AnimatedSprite(
+#         position=(200, 200),
+#         sprite_sheet_path='assets/images/Enemy/chickenRed.png'
+#     )
+#     sprite_group.add(animated_sprite)
+    
+#     # Game loop
+#     clock = pygame.time.Clock()
+#     running = True
+    
+#     while running:
+#         for event in pygame.event.get():
+#             if event.type == pygame.QUIT:
+#                 running = False
+        
+#         sprite_group.update()
+        
+#         screen.fill((50, 50, 50))
+#         sprite_group.draw(screen)
+#         pygame.display.flip()
+        
+#         clock.tick(60)
+    
+#     pygame.quit()

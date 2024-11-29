@@ -6,6 +6,7 @@
     "centery",
     "chiken",
     "colliderect",
+    "colorkey",
     "cooldown",
     "cygdrive",
     "cygpath",
@@ -16,6 +17,7 @@
     "MSYS",
     "numpy",
     "scikit",
+    "Spritesheets",
     "Spritnimation",
     "SRCALPHA",
     "venv"
