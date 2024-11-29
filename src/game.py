@@ -29,7 +29,7 @@ class Game:
         self.player = Player()
         
         # Creating Enemies
-        self.num_of_enemies = 6
+        self.num_of_enemies = 25
         self.enemies = []
         for i in range(self.num_of_enemies):
             x = (i % 3) * 200 + 100
@@ -39,6 +39,10 @@ class Game:
     def check_collisions(self):
         # Check laser collisions with enemies 
         for enemy in self.enemies[:]:
+            if enemy.rect.colliderect(self.player.rect):
+                self.player.die()
+                self.game_over()
+
             for laser in self.player.lasers[:]:
                 if laser.rect.colliderect(enemy.rect):
                     laser.engage()
@@ -47,7 +51,14 @@ class Game:
                     if not enemy.isChickenAlive:
                         self.enemies.remove(enemy)
                     break
-                        
+            for egg in enemy.eggs:
+                if egg.rect.colliderect(self.player.rect):
+                    self.player.die()
+                    self.game_over()
+
+    def game_over(self):
+        self.running = False
+
     def run(self):
         clock = pygame.time.Clock() # To keep the framerate consistent
         
@@ -89,5 +100,7 @@ class Game:
             self.screen.blit(score_text, (10, 10))
                 
             pygame.display.flip()
+
+        # implement end screen logic here
     
     

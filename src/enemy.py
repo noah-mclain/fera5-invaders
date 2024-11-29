@@ -2,6 +2,7 @@
 import pygame
 from os import path
 from egg import Egg
+from random import random
 class Chicken:
 
     chicken_counter=0
@@ -18,11 +19,15 @@ class Chicken:
         
         self.speed_x = 2
         self.direction = 1
+        self.eggs=[]
        
     
     def draw(self,screen):
         if self.isChickenAlive:
             screen.blit(self.image,self.rect)
+            for egg in self.eggs:
+                egg.draw(screen)
+            
 
     def update(self, screenWidth,screenHeight):
         if not self.isChickenAlive:
@@ -41,7 +46,26 @@ class Chicken:
             self.rect.top = 0
         if self.rect.bottom > screenHeight:
             self.rect.bottom = screenHeight
+            
+        if random() <= 0.001:
+            self.layEggs()
+
+        self.eggDisappear()
+        for egg in self.eggs:
+            egg.update(screenHeight)
+            
+            
         
+    def eggDisappear(self):
+        aliveEggs=[]
+        
+        for egg in self.eggs:
+            if egg.shouldDisappear()== False:
+                aliveEggs.append(egg)
+        #waw!        
+        self.eggs=aliveEggs
+
+            
 
     def killChicken(self):   
         if self.isChickenAlive:
@@ -56,11 +80,12 @@ class Chicken:
     def get_chicken_count():
         return Chicken.chicken_counter
 
-    def layEggs():
-        pass
     def layEggs(self):
         eggX= self.rect.centerx
         eggY=self.rect.bottom
-        return Egg(eggX,eggY)
+        egg = Egg(eggX,eggY)
+        self.eggs.append(egg)
+
+    
         
 

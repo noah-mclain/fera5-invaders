@@ -1,5 +1,6 @@
 import pygame
 from os import path
+
 # Laser class for shooting mechanics
 class Laser():
     def __init__(self, x, y):
