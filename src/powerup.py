@@ -1,1 +1,1 @@
-# Power-up class for bonuses
+# Power-up class for bonuses    
