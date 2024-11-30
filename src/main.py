@@ -9,13 +9,15 @@ def check_dependencies():
         "assets/images/ship.png",
         "assets/images/bullet/a1.png",
         "assets/images/shipDie.png",
-        "assets/images/Enemy/chickenRed.png", 
-        "assets/images/Enemy/dead.png"
+        "assets/images/Enemy/chickenRed.png",
+        "assets/images/Enemy/dead.png",
+        "assets/images/Enemy/egg.png"
     ]
     
     for file in required_files:
         try:
-            open(file)
+            with open(file, 'rb') as f:
+                print(f"Found {file}")
         except FileNotFoundError:
             print(f"Error: Required file '{file}' not found!")
             return False

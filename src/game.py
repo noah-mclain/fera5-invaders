@@ -11,6 +11,7 @@ from environment.sprite import StaticSprite
 
 class Game:
     def __init__(self):
+        print("Initializing game...")
         # Initialize pygame
         if not pygame.get_init():
             pygame.init()
@@ -18,21 +19,17 @@ class Game:
         try:
             # Get current dimensions
             info = pygame.display.Info()
-            self.screen_width = min(info.current_w, 1920)  # Cap at reasonable size
+            self.screen_width = min(info.current_w, 1920)
             self.screen_height = min(info.current_h, 1080)
+            print(f"Screen dimensions: {self.screen_width}x{self.screen_height}")
             
-            # Create screen with fallback
-            try:
-                self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
-            except pygame.error:
-                print("Failed to create full-screen window, trying windowed mode")
-                self.screen_width = 1280
-                self.screen_height = 720
-                self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
-            
+            # Create screen
+            self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
             if not self.screen:
                 raise RuntimeError("Failed to create display")
-                
+            
+            print("Display created successfully")
+            
             pygame.display.set_caption("Fera5 Invaders")
             
             self.running = True
@@ -82,11 +79,6 @@ class Game:
             if not path.exists(sprite_sheet_path):
                 raise FileNotFoundError(f"Sprite sheet not found: {sprite_sheet_path}")
             
-            # Create a test chicken to verify animation setup
-            test_position = (0, 0)
-            test_chicken = Chicken(test_position, sprite_sheet_path)
-            print("Test chicken created successfully")
-            
             enemies_created = 0
             for i in range(self.num_of_enemies):
                 try:
@@ -98,6 +90,7 @@ class Game:
                     self.enemies.add(chicken)
                     self.all_sprites.add(chicken)
                     enemies_created += 1
+                    print(f"Created enemy {enemies_created}")
                     
                 except Exception as e:
                     print(f"Failed to create enemy {i}: {str(e)}")

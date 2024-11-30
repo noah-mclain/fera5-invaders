@@ -38,12 +38,11 @@ class AnimationSequence:
                 self.frame_index += 1
             else:
                 if self.loop:
-                    self.frame_index = 0
+                    self.frame_index = 0  # Reset to first frame for looping animations
                 else:
-                    # Mark animation as finished and trigger callback
-                    if not self.animation_finished:
-                        self.animation_finished = True
-                        if self.callback:
-                            self.callback()
+                    # For non-looping animations, stay on last frame
+                    self.animation_finished = True
+                    if self.callback:
+                        self.callback()
         
         return self.frames[self.frame_index]

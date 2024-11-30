@@ -7,54 +7,62 @@ class AnimatedSprite(pygame.sprite.Sprite):
     def __init__(self, position, sprite_sheet_path, sprite_type="chicken"):
         super().__init__()
         
-        # Load sprite sheet
-        self.sprite_sheet_image = pygame.image.load(sprite_sheet_path).convert_alpha()
-        self.sprite_sheet = SpriteSheet(self.sprite_sheet_image)
-        
-        # Extract all frames
-        self.frames = {}
-        self.load_frames(sprite_type)
-        
-        # Set up animation sequences based on sprite type
-        self.setup_animations(sprite_type)
-        
-        # Set up initial sprite image and rect
-        self.image = self.frames["alive"][0]
-        self.rect = self.image.get_rect(topleft=position)
-        
-        # Track current animation state
-        self.current_animation = None
-        self.previous_animation = None
+        try:
+            # Load sprite sheet
+            print(f"Loading sprite sheet from: {sprite_sheet_path}")
+            self.sprite_sheet_image = pygame.image.load(sprite_sheet_path).convert_alpha()
+            self.sprite_sheet = SpriteSheet(self.sprite_sheet_image)
+            
+            # Extract all frames
+            self.frames = {}
+            self.load_frames(sprite_type)
+            
+            # Set up animation sequences based on sprite type
+            self.setup_animations(sprite_type)
+            
+            # Set up initial sprite image and rect
+            if "alive" not in self.frames or not self.frames["alive"]:
+                raise ValueError("No 'alive' frames loaded")
+            
+            self.image = self.frames["alive"][0]
+            self.rect = self.image.get_rect(topleft=position)
+            
+            # Track current animation state
+            self.current_animation = None
+            self.previous_animation = None
+            
+        except Exception as e:
+            print(f"Error initializing AnimatedSprite: {str(e)}")
+            raise
     
     def load_frames(self, sprite_type):
-        # Different frame dimensions for different sprites and their states
+        # Different frame dimensions and positions for different sprites and their states
         sprite_data = {
             "chicken": {
                 "alive": {
                     "width": 40,
                     "height": 35,
-                    "frames": list(range(0, 9)),  # frames 0-8
+                    "frames": [
+                        {"x": i * 40, "y": 0} for i in range(10)  # Generates 10 frames with x positions 0, 40, 80, etc.
+                    ],
                     "scale": 1
                 },
                 "dead": {
-                    "width": 50,  # Adjust these dimensions for the dead sprite
-                    "height": 45,
-                    "frames": [10],  # frame 10
+                    "width": 37,
+                    "height": 35,
+                    "frames": [
+                        {"x": 366, "y": 0}
+                    ],
                     "scale": 1
                 },
                 "food": {
-                    "width": 30,  # Adjust these dimensions for the food sprite
-                    "height": 30,
-                    "frames": [11, 12, 13],  # frames 11-13
-                    "scale": 1
-                }
-            },
-            "egg": {
-                "whole": {
-                    "width": 28,
-                    "height": 24,
-                    "frames": [0],
-                    "scale": 1
+                    "frames": [
+                        {"x": 403, "y": 0, "width": 21, "height": 35},
+                        {"x": 424, "y": 0, "width": 41, "height": 35},
+                        {"x": 465, "y": 0, "width": 45, "height": 35}
+                    ],
+                    "scale": 1,
+                    "speed": 0.5  # Slower animation speed for food
                 }
             }
         }
@@ -64,24 +72,28 @@ class AnimatedSprite(pygame.sprite.Sprite):
             raise ValueError(f"Unknown sprite type: {sprite_type}")
         
         # Extract frames for each animation state
-        self.frames = {}  # Change to dictionary to store frames by state
+        self.frames = {}
         
         for state, state_data in data.items():
             self.frames[state] = []
-            for frame_num in state_data["frames"]:
+            for frame_data in state_data["frames"]:
                 try:
-                    frame = self.sprite_sheet.get_image(
-                        frame=frame_num,
-                        width=state_data["width"],
-                        height=state_data["height"],
+                    width = frame_data.get("width", state_data.get("width"))
+                    height = frame_data.get("height", state_data.get("height"))
+                    
+                    print(f"Loading {state} frame with dimensions: {width}x{height}")
+                    
+                    frame = self.sprite_sheet.get_image_at_pos(
+                        x=frame_data["x"],
+                        y=frame_data["y"],
+                        width=width,
+                        height=height,
                         scale=state_data["scale"],
                         color=(0, 0, 0)
                     )
                     self.frames[state].append(frame)
-                    print(f"Loaded {state} frame {frame_num}")
                 except Exception as e:
-                    print(f"Error loading {state} frame {frame_num}: {str(e)}")
-                    raise
+                    print(f"Error loading {state} frame: {str(e)}")
     
     def setup_animations(self, sprite_type):
         animation_data = {

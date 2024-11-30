@@ -26,6 +26,9 @@ class Chicken(AnimatedSprite):
 
     def update(self, screenWidth=None, screenHeight=None):
         """Update chicken's position and animation."""
+        # Debug logging
+        print(f"Current state: {self.current_state}, Animation: {self.current_animation}")
+        
         # Update position based on current state
         if self.current_state == "alive":
             if screenWidth is not None and screenHeight is not None:
@@ -63,8 +66,11 @@ class Chicken(AnimatedSprite):
         if self.current_state == "dead":  # Only switch if we're in dead state
             self.current_state = "food"
             self.stop_animation()
-            self.play_animation("food", loop=True)
-            self.is_food = True
+            if "food" in self.animations:
+                self.animations["food"].frame_index = 0  # Reset frame index
+                self.animations["food"].last_update = pygame.time.get_ticks()  # Reset timer
+                self.play_animation("food", loop=True)
+                self.is_food = True
 
     def _remove_sprite(self):
         """Remove the sprite after all animations are complete"""
