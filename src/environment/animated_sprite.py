@@ -36,33 +36,41 @@ class AnimatedSprite(pygame.sprite.Sprite):
             raise
     
     def load_frames(self, sprite_type):
-        # Different frame dimensions and positions for different sprites and their states
+        # Different frame dimensions for different sprites and their states
         sprite_data = {
             "chicken": {
                 "alive": {
                     "width": 40,
                     "height": 35,
                     "frames": [
-                        {"x": i * 40, "y": 0} for i in range(10)  # Generates 10 frames with x positions 0, 40, 80, etc.
+                        {"x": i * 40, "y": 0} for i in range(10)  # Generates frames with x positions
                     ],
                     "scale": 1
                 },
                 "dead": {
-                    "width": 37,
+                    "width": 45,
                     "height": 35,
                     "frames": [
-                        {"x": 366, "y": 0}
-                    ],
+                        {"x": 360, "y": 0}],  # Single frame for death
                     "scale": 1
                 },
-                "food": {
+               "food": {
+                    "width": 45,
+                    "height": 35,
                     "frames": [
-                        {"x": 403, "y": 0, "width": 21, "height": 35},
-                        {"x": 424, "y": 0, "width": 41, "height": 35},
-                        {"x": 465, "y": 0, "width": 45, "height": 35}
+                        {"x": 405, "y": 0, "width": 45, "height": 35},   # First food frame
+                        {"x": 450, "y": 0, "width": 45, "height": 35},   # Second food frame
+                        {"x": 495, "y": 0, "width": 45, "height": 35}    # Third food frame
                     ],
                     "scale": 1,
-                    "speed": 0.5  # Slower animation speed for food
+                }
+            },
+            "egg": {
+                "whole": {
+                    "width": 28,
+                    "height": 24,
+                    "frames": [0],
+                    "scale": 1
                 }
             }
         }
@@ -72,16 +80,21 @@ class AnimatedSprite(pygame.sprite.Sprite):
             raise ValueError(f"Unknown sprite type: {sprite_type}")
         
         # Extract frames for each animation state
-        self.frames = {}
+        self.frames = {}  # Change to dictionary to store frames by state
         
         for state, state_data in data.items():
             self.frames[state] = []
-            for frame_data in state_data["frames"]:
+            for frame_data in state_data.get("frames", []):
                 try:
-                    width = frame_data.get("width", state_data.get("width"))
-                    height = frame_data.get("height", state_data.get("height"))
+                    # Ensure frame_data is a dictionary
+                    if isinstance(frame_data, int):
+                        raise ValueError(f"Expected frame data to be a dictionary, got int: {frame_data}")
+
+                    # Debugging output to check frame data
+                    print(f"Processing {state} frame data: {frame_data}")
                     
-                    print(f"Loading {state} frame with dimensions: {width}x{height}")
+                    width = frame_data.get("width", state_data["width"])
+                    height = frame_data.get("height", state_data["height"])
                     
                     frame = self.sprite_sheet.get_image_at_pos(
                         x=frame_data["x"],
@@ -91,16 +104,24 @@ class AnimatedSprite(pygame.sprite.Sprite):
                         scale=state_data["scale"],
                         color=(0, 0, 0)
                     )
-                    self.frames[state].append(frame)
+                    
+                    if frame is not None:
+                        self.frames[state].append(frame)
+                        print(f"Loaded {state} frame at position ({frame_data['x']}, {frame_data['y']}) with size {width}x{height}")
+                        
                 except Exception as e:
                     print(f"Error loading {state} frame: {str(e)}")
+            
+        # Debugging output
+        for state, frames in self.frames.items():
+            print(f"{state} frames loaded: {len(frames)}") 
     
     def setup_animations(self, sprite_type):
         animation_data = {
             "chicken": {
                 "alive": {"speed": 0.1},
-                "dead": {"speed": 0.5},
-                "food": {"speed": 0.2}
+                "dead": {"speed": 0.1},
+                "food": {"speed": 0.5}
             },
             "egg": {
                 "whole": {"speed": 0.1}
@@ -115,13 +136,15 @@ class AnimatedSprite(pygame.sprite.Sprite):
         
         for anim_name, anim_info in data.items():
             try:
+                if anim_name not in self.frames or not self.frames[anim_name]:
+                    raise ValueError(f"No frames loaded for animation '{anim_name}'")
+                
                 self.animations[anim_name] = AnimationSequence(
                     self.frames[anim_name],
                     animation_speed=anim_info["speed"]
                 )
             except Exception as e:
                 print(f"Error setting up {anim_name} animation: {str(e)}")
-                raise
     
     def play_animation(self, animation_name, loop=True):
         """Play the specified animation sequence"""
@@ -157,40 +180,3 @@ class AnimatedSprite(pygame.sprite.Sprite):
             elif not current_anim.loop:
                 # If animation is done and not looping, keep the last frame
                 self.image = current_anim.frames[current_anim.frame_index]
-
-# Test the animation
-# if __name__ == "__main__":
-#     pygame.init()
-    
-#     # Set up display
-#     SCREEN_WIDTH = 500
-#     SCREEN_HEIGHT = 500
-#     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-#     pygame.display.set_caption('Animated Sprite')
-    
-#     # Create sprite and sprite group
-#     sprite_group = pygame.sprite.Group()
-#     animated_sprite = AnimatedSprite(
-#         position=(200, 200),
-#         sprite_sheet_path='assets/images/Enemy/chickenRed.png'
-#     )
-#     sprite_group.add(animated_sprite)
-    
-#     # Game loop
-#     clock = pygame.time.Clock()
-#     running = True
-    
-#     while running:
-#         for event in pygame.event.get():
-#             if event.type == pygame.QUIT:
-#                 running = False
-        
-#         sprite_group.update()
-        
-#         screen.fill((50, 50, 50))
-#         sprite_group.draw(screen)
-#         pygame.display.flip()
-        
-#         clock.tick(60)
-    
-#     pygame.quit()

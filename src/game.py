@@ -57,7 +57,7 @@ class Game:
     def setup_enemy_grid(self):
         try:
             # Enemy grid configuration
-            self.num_of_enemies = 25
+            self.num_of_enemies = 2
             chicken_width = 40
             chicken_height = 35
             
@@ -73,7 +73,7 @@ class Game:
             print(f"Spacing: {spacing_x}x{spacing_y}")
             
             # Create enemies
-            sprite_sheet_path = path.join("assets", "images", "Enemy", "chickenRed.png")
+            sprite_sheet_path = path.join("assets", "images", "Enemy", "chickenRedSpriteSheet.png")
             
             # Verify sprite sheet exists
             if not path.exists(sprite_sheet_path):
@@ -112,6 +112,7 @@ class Game:
                 if laser.rect.colliderect(enemy.rect):
                     laser.engage()
                     enemy.killChicken()
+                    enemy.update(self.screen_width, self.screen_height)
                     self.score += 100
                     break
                         

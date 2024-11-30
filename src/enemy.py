@@ -40,6 +40,8 @@ class Chicken(AnimatedSprite):
                     self.direction = 1
                 elif self.rect.right >= screenWidth:
                     self.direction = -1
+        elif self.current_state == "dead":
+            self._switch_to_food()
         elif self.current_state == "food":
             self.y += self.fall_speed
             self.rect.y = self.y
@@ -50,26 +52,30 @@ class Chicken(AnimatedSprite):
         
         # Always update the current animation
         super().update()
-
+    
     def killChicken(self):
         """Handle chicken death."""
         if self.current_state == "alive":
             self.isChickenAlive = False
             self.current_state = "dead"
             self.stop_animation()
-            self.play_animation("dead", loop=False)
-            self.animations["dead"].callback = self._switch_to_food
+            if 'dead' in self.animations:
+                self.play_animation("dead", loop=False)
+            print("playing dead animation")
+            # self.animations["dead"].callback = self._switch_to_food
+            
             Chicken.chicken_counter -= 1
 
     def _switch_to_food(self):
         """Helper method to switch to food state"""
         if self.current_state == "dead":  # Only switch if we're in dead state
+            print("Switching to food")
             self.current_state = "food"
             self.stop_animation()
             if "food" in self.animations:
                 self.animations["food"].frame_index = 0  # Reset frame index
                 self.animations["food"].last_update = pygame.time.get_ticks()  # Reset timer
-                self.play_animation("food", loop=True)
+                self.play_animation("food", loop=False)
                 self.is_food = True
 
     def _remove_sprite(self):

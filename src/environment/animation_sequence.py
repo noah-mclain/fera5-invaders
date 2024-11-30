@@ -28,7 +28,7 @@ class AnimationSequence:
     def update(self, current_time):
         """Update the animation frame"""
         if not self.is_playing:
-            return self.frames[self.frame_index]
+            return self.frames[self.frame_index] if self.frames else None
             
         if current_time - self.last_update > self.animation_speed * 1000:
             self.last_update = current_time
@@ -44,5 +44,10 @@ class AnimationSequence:
                     self.animation_finished = True
                     if self.callback:
                         self.callback()
-        
-        return self.frames[self.frame_index]
+                        
+        # Make sure frame_index is valid before accessing
+        if 0 <= self.frame_index < len(self.frames):
+            return self.frames[self.frame_index]
+        else:
+            print(f"Warning: Invalid frame index {self.frame_index}. Total frames: {len(self.frames)}")
+            return None  # Or handle accordingly

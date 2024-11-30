@@ -9,8 +9,7 @@ def check_dependencies():
         "assets/images/ship.png",
         "assets/images/bullet/a1.png",
         "assets/images/shipDie.png",
-        "assets/images/Enemy/chickenRed.png",
-        "assets/images/Enemy/dead.png",
+        "assets/images/Enemy/chickenRedSpriteSheet.png",
         "assets/images/Enemy/egg.png"
     ]
     
