@@ -42,9 +42,10 @@ class Chicken(AnimatedSprite):
                 elif self.rect.right >= screenWidth:
                     self.direction = -1
                     
-                # Laying those eggs
-                if random.random() < 0.01:
-                    self.layEggs()
+            # Laying those eggs
+            if random.random() < 0.01:
+                self.lay_eggs()
+                Egg.update(screenHeight)
                     
         elif self.current_state == "dead":
             self._switch_to_food()
@@ -98,10 +99,12 @@ class Chicken(AnimatedSprite):
     def get_chicken_count():
         return Chicken.chicken_counter
 
-    def layEggs(self):
+    def lay_eggs(self):
         """Lay eggs from the chicken's position."""
         egg_x = self.rect.centerx
         egg_y = self.rect.bottom
         new_egg = Egg(egg_x, egg_y)
         self.eggs.append(new_egg)
+        print(f"Laying egg at position: ({egg_x}, {egg_y})")  
         return Egg(egg_x, egg_y)
+    
