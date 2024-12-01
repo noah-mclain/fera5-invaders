@@ -4,7 +4,7 @@ from environment.sprite_sheet import SpriteSheet
 from environment.animation_sequence import AnimationSequence
 
 class AnimatedSprite(pygame.sprite.Sprite):
-    def __init__(self, position, sprite_sheet_path, sprite_type="chicken"):
+    def __init__(self, position, sprite_sheet_path, sprite_type="chicken", initial_state="alive"):
         super().__init__()
         
         try:
@@ -15,16 +15,16 @@ class AnimatedSprite(pygame.sprite.Sprite):
             
             # Extract all frames
             self.frames = {}
-            self.load_frames(sprite_type)
+            self.load_frames(sprite_type)  # Load frames based on sprite type
             
             # Set up animation sequences based on sprite type
-            self.setup_animations(sprite_type)
+            self.setup_animations(sprite_type)  # Setup animations
             
             # Set up initial sprite image and rect
-            if "alive" not in self.frames or not self.frames["alive"]:
-                raise ValueError("No 'alive' frames loaded")
+            if initial_state not in self.frames or not self.frames[initial_state]:
+                raise ValueError(f"No '{initial_state}' frames loaded")
             
-            self.image = self.frames["alive"][0]
+            self.image = self.frames[initial_state][0]
             self.rect = self.image.get_rect(topleft=position)
             
             # Track current animation state
@@ -69,7 +69,8 @@ class AnimatedSprite(pygame.sprite.Sprite):
                 "whole": {
                     "width": 28,
                     "height": 24,
-                    "frames": [0],
+                    "frames": [
+                        {"x": 0, "y": 0, "width": 28, "height": 24}],
                     "scale": 1
                 }
             }

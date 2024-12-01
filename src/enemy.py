@@ -1,18 +1,19 @@
 import pygame
 from os import path
+import random
 from egg import Egg
 from environment.animated_sprite import AnimatedSprite
-import random
 
 class Chicken(AnimatedSprite):
     chicken_counter = 0
 
     def __init__(self, position, sprite_sheet_path):
-        super().__init__(position, sprite_sheet_path, sprite_type="chicken")
+        super().__init__(position, sprite_sheet_path, sprite_type="chicken", initial_state="alive")
         self.isChickenAlive = True
         self.speed_x = 2
         self.direction = 1
         self.x, self.y = position
+        self.eggs = []
         self.fall_speed = 3
         Chicken.chicken_counter += 1
         
@@ -40,6 +41,11 @@ class Chicken(AnimatedSprite):
                     self.direction = 1
                 elif self.rect.right >= screenWidth:
                     self.direction = -1
+                    
+                # Laying those eggs
+                if random.random() < 0.01:
+                    self.layEggs()
+                    
         elif self.current_state == "dead":
             self._switch_to_food()
         elif self.current_state == "food":
@@ -49,6 +55,12 @@ class Chicken(AnimatedSprite):
             # Remove if falls off screen
             if screenHeight and self.rect.top > screenHeight:
                 self._remove_sprite()
+                
+        for egg in self.eggs:
+            egg.update(screenHeight)
+            
+        # Remove any eggs that have disappeared
+        self.eggs = [egg for egg in self.eggs if not egg.should_disappear()]
         
         # Always update the current animation
         super().update()
@@ -90,4 +102,6 @@ class Chicken(AnimatedSprite):
         """Lay eggs from the chicken's position."""
         egg_x = self.rect.centerx
         egg_y = self.rect.bottom
+        new_egg = Egg(egg_x, egg_y)
+        self.eggs.append(new_egg)
         return Egg(egg_x, egg_y)

@@ -1,32 +1,36 @@
 import pygame
+from os import path
+from environment.animated_sprite import AnimatedSprite
 
-class Egg:
+class Egg(AnimatedSprite):
     
     isDisappear=False
     
-    def __init__(self,x,y) -> None:
-        image=pygame.image.load('assets/images/Enemy/egg.png')
-        self.width=10
-        self.height=10
-        self.image = pygame.transform.scale(image, (self.width, self.height))
-        self.rect=self.image.get_rect(topleft=(x,y))
-        self.speedY=2
+    def __init__(self, x, y):
+        sprite_sheet_path = path.join("assets", "images", "Enemy", "eggSpriteSheet.png")
+        
+        super().__init__((x, y), sprite_sheet_path, sprite_type="egg", initial_state="whole")
+        
+        self.speedY = 2
+        self.isDisappear = False
+        
+        self.play_animation("whole", loop=False)
         
 
-    def draw(self,screen):
-        screen.blit(self.image,self.rect)
+    # def draw(self,screen):
+    #     super().draw(screen)
     
     def update(self,screenHeight):
-        self.rect.y+=self.speedY
+        self.rect.y += self.speedY
         
         #if egg hits bottom of screen
-        if self.rect.bottom>screenHeight:
-            self.rect.bottom=screenHeight
-            Egg.isDisappear=True
+        if self.rect.bottom>  screenHeight:
+            self.rect.bottom = screenHeight
+            self.isDisappear = True
 
         #if egg hits spaceship?
     
-    def shouldDisappear(self):
+    def should_disappear(self):
         return Egg.isDisappear  
         
             
