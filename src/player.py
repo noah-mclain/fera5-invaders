@@ -21,6 +21,9 @@ class Player:
         self.max_speed = 5 
         self.alive = True
         self.lasers = []
+        self.lives = 3
+        self.flicker_timer = 0
+        
 
 
     def shoot(self):
@@ -47,6 +50,9 @@ class Player:
 
     # drawing the player ship
     def draw(self, screen):
+        if pygame.time.get_ticks() - self.flicker_timer < 1000:
+            if(pygame.time.get_ticks() // 100) % 2 ==0:
+                return
         screen.blit(self.image, self.rect)
         for laser in self.lasers:
             laser.draw(screen)
@@ -67,8 +73,13 @@ class Player:
         self.image = pygame.image.load(death_image_path)
         self.alive = False
 
+    def lose_life(self):
+        self.lives -= 1
+        self.flicker_timer = pygame.time.get_ticks()
         
-       
+        
+    def is_alive(self):
+        return self.lives > 0
 
 
     
