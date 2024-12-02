@@ -43,7 +43,7 @@ class AI:
         self.input_nodes = self.environment.input_nodes()
         return self.input_nodes
 
-class DQNMODEL(tf.keras.models):
+class DQNMODEL(tf.keras.Model):
     def __init__(self, input_size, num_actions):
         super(DQNMODEL, self).__init__()
         
