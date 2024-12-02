@@ -11,7 +11,6 @@ from environment.sprite import StaticSprite
 
 class Game:
     def __init__(self):
-        print("Initializing game...")
         print("Initializing Game...")
         # Initialize pygame
         if not pygame.get_init():
@@ -118,15 +117,13 @@ class Game:
             print(f"Error setting up enemy grid: {str(e)}")
             raise
     
-        # Creating Player instance
-        self.player = Player()
         # Creating Enemies
-        self.num_of_enemies = 18
-        self.enemies = []
-        for i in range(self.num_of_enemies):
-            x = (i // 3) * 200 + 100
-            y = (i % 3) * 100 + 50
-            self.enemies.append(Chicken(x, y))     
+        # self.num_of_enemies = 18
+        # self.enemies = []
+        # for i in range(self.num_of_enemies):
+        #     x = (i // 3) * 200 + 100
+        #     y = (i % 3) * 100 + 50
+        #     self.enemies.append(Chicken(x, y))     
         
     def check_collisions(self):
         # Check laser collisions with enemies 
@@ -230,8 +227,9 @@ class Game:
     def render_game_state(self):
         self.screen.fill((0,0,0))
         self.player.draw(self.screen)
-        for enemy in self.enemies:
-            enemy.draw(self.screen)
+        
+        self.all_sprites.draw(self.screen)
+            
         self.render_lives()
         self.render_scores()
         pygame.display.flip()
@@ -242,9 +240,7 @@ class Game:
         heart_image = pygame.transform.scale(heart_image, (40, 40))
         for i in range(self.player.lives):
             self.screen.blit(heart_image, (self.screen_width - (i+1)*50, 10))
-            
-            
-            
+
     def display_victory_message(self):
         font = pygame.font.Font(None, 72)
         victory_text = font.render("You Win!", True, (0, 255, 0))
