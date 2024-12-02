@@ -1,17 +1,15 @@
 import pygame
 from os import path
+from environment.sprite import StaticSprite
 
 # Laser class for shooting mechanics
-class Laser():
+class Laser(StaticSprite):
     def __init__(self, x, y):
         image_path = path.join("assets", "images", "bullet", "a1.png")
-        self.image = pygame.image.load(image_path)
-        self.rect = self.image.get_rect()
-        self.rect.centerx = x
-        self.rect.centery = y + 5
-        self.speed = -5
-        self.rect.centerx = x
-        self.rect.centery = y + 5
+        position = (x, y + 5)
+        
+        super().__init__(image_path, position)
+        
         self.speed = -5
         self.is_fired = False
         self.is_engaged = False
@@ -19,11 +17,10 @@ class Laser():
     def draw(self, screen):
         screen.blit(self.image, self.rect)
 
-    def update(self):
+    def update(self, screenWidth=None, screenHeight=None):
         self.rect.y += self.speed
         if self.rect.bottom < 0 or self.is_engaged:
             self.die()
-
 
     def fire(self):
         self.is_fired = True

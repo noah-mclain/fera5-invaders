@@ -3,20 +3,19 @@ import pygame
 import copy
 from os import path
 from laser import Laser
+from environment.sprite import StaticSprite
 
-class Player:
-    def __init__(self):
+class Player(StaticSprite):
+    def __init__(self, screen_width, screen_height):
+        self.screen_width = screen_width
+        self.screen_height = screen_height
+        
         image_path = path.join("assets", "images", "ship.png")
-        image = pygame.image.load(image_path)
-        self.width = 50
-        self.height = 50
-        self.image = pygame.transform.scale(image, (self.width, self.height))
-        self.rect = self.image.get_rect()
-        info = pygame.display.Info()
-        self.screen_width = info.current_w
-        self.screen_height = info.current_h
-        self.rect.x = self.screen_width // 2
-        self.rect.y = self.screen_height - 200
+        size = (50, 50)
+        position = (screen_width // 2, screen_height - 200)
+        
+        super().__init__(image_path, position, size)
+        
         self.speed = 0
         self.max_speed = 5 
         self.alive = True
@@ -38,8 +37,6 @@ class Player:
                 new_lasers.append(laser)
         self.lasers = new_lasers
         
-
-
     # player movement
     def move(self,change):
         self.speed += change
@@ -47,7 +44,6 @@ class Player:
     def stop(self):
         self.speed = 0
     
-
     # drawing the player ship
     def draw(self, screen):
         if pygame.time.get_ticks() - self.flicker_timer < 1000:
@@ -57,16 +53,18 @@ class Player:
         for laser in self.lasers:
             laser.draw(screen)
     
-    def update(self):
+    def update(self, screenWidth=None, screenHeight=None):
+        # Update position
         self.rect.x += self.speed
         if self.rect.x < 0:
             self.rect.x = 0
         elif self.rect.x > self.screen_width - self.rect.width:
             self.rect.x = self.screen_width - self.rect.width
+            
+        # Update lasers
         self.fired_lasers()
         for laser in self.lasers:
             laser.update()
-
 
     def die(self):
         death_image_path = path.join("assets", "images", "shipDie.png")
