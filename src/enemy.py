@@ -60,6 +60,15 @@ class Chicken(AnimatedSprite):
         
         # Always update the current animation
         super().update()
+        
+    def eggDisappear(self):
+        aliveEggs=[]
+        
+        for egg in self.eggs:
+            if egg.shouldDisappear()== False:
+                aliveEggs.append(egg)
+        #waw!        
+        self.eggs=aliveEggs
     
     def killChicken(self):
         """Handle chicken death."""
