@@ -126,8 +126,7 @@ class Game:
         for i in range(self.num_of_enemies):
             x = (i // 3) * 200 + 100
             y = (i % 3) * 100 + 50
-            self.enemies.append(Chicken(x, y))
-        
+            self.enemies.append(Chicken(x, y))     
         
     def check_collisions(self):
         # Check laser collisions with enemies 
@@ -182,8 +181,6 @@ class Game:
                     if not self.paused and (event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT):
                         self.player.stop()
                         
-            
-            
             # Update enemies
             if not self.enemies:
                 self.display_victory_message()
@@ -198,10 +195,7 @@ class Game:
                 pause_text = font.render("Game paused (Press P to resume)", True, (255,255,255))
                 self.screen.blit(pause_text, (self.screen.width // 2 - 200, self.screen_height // 2))
                 pygame.display.flip()
-            
-            
-                
-            
+        
     def update_game_state(self):       
         # Update sprites
             self.player.update(self.screen_width, self.screen_height)
