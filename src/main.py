@@ -9,33 +9,50 @@ def check_dependencies():
         "assets/images/ship.png",
         "assets/images/bullet/a1.png",
         "assets/images/shipDie.png",
-        "assets/images/Enemy/chiken.png", 
-        "assets/images/Enemy/dead.png",
-        "assets/images/background/heart.png",
-        "assets/images/scores1.png"
+        "assets/images/Enemy/chickenRedSpriteSheet.png",
+        "assets/images/Enemy/eggSpriteSheet.png"
     ]
     
     for file in required_files:
         try:
-            open(file)
+            with open(file, 'rb') as f:
+                print(f"Found {file}")
         except FileNotFoundError:
             print(f"Error: Required file '{file}' not found!")
             return False
     return True
 
 def main():
-    # Check dependencies
-    if not check_dependencies():
-        sys.exit("Missing required files!")
-
+    game = None
     try:
+        print("Checking dependencies...")
+        if not check_dependencies():
+            print("Missing required files. Please ensure all assets are in place.")
+            return
+
+        print("Initializing pygame...")
         pygame.init()
+        
+        print("Setting up display...")
+        pygame.display.init()
+        
+        print("Creating game...")
         game = Game()
-        game.run()
+        print("Game created successfully")
+        
+        print("Running game...")
+        if game:
+            game.run()
+        
+    except pygame.error as e:
+        print(f"Pygame error occurred: {str(e)}")
     except Exception as e:
-        print(f"An error occurred: {e}")
-        raise  # Re-raise the exception for debugging
+        print(f"An unexpected error occurred: {str(e)}")
+        import traceback
+        traceback.print_exc()
     finally:
+        if game:
+            game.running = False
         pygame.quit()
         sys.exit()
 

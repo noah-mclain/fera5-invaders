@@ -136,7 +136,7 @@ class AI:
 
 
 
-class DQNMODEL(tf.keras.models):
+class DQNMODEL(tf.keras.Model):
     def __init__(self, input_size, num_actions):
         super(DQNMODEL, self).__init__()
         self.dense1 = tf.keras.Model.layers.Dense(64, activation = 'relu', input_shape = (self.environment.input_nodes()))
