@@ -14,11 +14,10 @@ class Egg(AnimatedSprite):
         self.speedY = 2
         self.isDisappear = False
         
-        self.play_animation("whole", loop=False)
+        self.current_state = "whole"
+        self.isEggWhole = True
         
-
-    # def draw(self,screen):
-    #     super().draw(screen)
+        self.play_animation("whole", loop=False)
     
     def update(self,screenHeight):
         self.rect.y += self.speedY
@@ -27,11 +26,23 @@ class Egg(AnimatedSprite):
         if self.rect.bottom>  screenHeight:
             self.rect.bottom = screenHeight
             self.isDisappear = True
+            
+    def breakEgg(self):
+        if self.current_state == "whole":
+            self.isEggWhole = False
+            self.current_state = "broken"
+            self.stop_animation()
+            if 'broken' in self.animations:
+                self.play_animation("broken", loop=False)
+            print("playing broken animation")
 
         #if egg hits spaceship?
     
     def should_disappear(self):
         return Egg.isDisappear  
+    
+    def isEggWhole(self):
+        return self.isEggWhole
         
             
         

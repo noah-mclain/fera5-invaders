@@ -115,6 +115,14 @@ class Game:
                     enemy.update(self.screen_width, self.screen_height)
                     self.score += 100
                     break
+        # Flatten the list of eggs from all the enemies
+        for egg in [egg for enemy in self.enemies for egg in enemy.eggs]:
+            for laser in self.player.lasers[:]:
+                if laser.rect.colliderect(egg.rect):
+                    laser.engage()
+                    egg.breakEgg()
+                    self.all_sprites.remove(laser)
+                    break
                         
     def run(self):
         clock = pygame.time.Clock() # To keep the framerate consistent
