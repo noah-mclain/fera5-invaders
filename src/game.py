@@ -158,7 +158,11 @@ class Game:
             # Update enemies
             for enemy in self.enemies:
                 enemy.update(self.screen_width, self.screen_height)
-            
+                if enemy.current_state == "alive":
+                     # Laying those eggs
+                    if random.random() < 0.01:
+                        enemy.lay_eggs(self.all_sprites)
+                    
             # Draw all sprites
             self.all_sprites.draw(self.screen)
                 

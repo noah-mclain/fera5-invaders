@@ -72,7 +72,22 @@ class AnimatedSprite(pygame.sprite.Sprite):
                     "frames": [
                         {"x": 0, "y": 0, "width": 28, "height": 24}],
                     "scale": 1
-                }
+                },
+                "broken": {
+                    "width": 28,
+                    "height": 24,
+                    "frames": [
+                        {"x": 28, "y": 0, "width": 28, "height": 25},
+                        {"x": 56, "y": 0, "width": 28, "height": 25},
+                        {"x": 81, "y": 0, "width": 28, "height": 25},
+                        {"x": 109, "y": 0, "width": 28, "height": 25},
+                        {"x": 137, "y": 0, "width": 28, "height": 25},
+                        {"x": 165, "y": 0, "width": 28, "height": 25},
+                        {"x": 193, "y": 0, "width": 28, "height": 25},
+                        {"x": 221, "y": 0, "width": 28, "height": 25},
+                    ],
+                    "scale": 1,
+                }     
             }
         }
         
