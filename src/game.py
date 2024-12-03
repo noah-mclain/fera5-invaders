@@ -126,10 +126,11 @@ class Game:
         for enemy in self.enemies.sprites():
             for laser in self.player.lasers[:]:
                 if laser.rect.colliderect(enemy.rect):
-                    laser.engage()
-                    enemy.killChicken()
-                    enemy.update(self.screen_width, self.screen_height)
-                    self.score += 100
+                    if enemy.current_state == "alive":  # Increment score only if alive
+                        laser.engage()
+                        enemy.killChicken()
+                        enemy.update(self.screen_width, self.screen_height)
+                        self.score += 100
                     break
 
         # Flatten the list of eggs from all the enemies
@@ -141,12 +142,11 @@ class Game:
                     for laser in self.player.lasers[:]:
                         if laser.rect.colliderect(egg.rect):
                             laser.engage()
-                            egg.breakEgg()
-                            egg.isDisappear = True  # Mark as disappeared
+                            egg.breakEgg()  # Trigger the broken animation
                             if laser in self.all_sprites:
                                 self.all_sprites.remove(laser)
                             break
-                        
+                    
                     # Check collision with player
                     if egg.rect.colliderect(self.player.rect):
                         if self.player.lose_life():
@@ -154,14 +154,17 @@ class Game:
                             if len(self.hearts) > (self.player.lives):  
                                 print(f"Losing life: {self.player.lives}")
                                 self.hearts[self.player.lives].lose_life()
+                            
+                            # Check if player is alive after losing life
+                            if not self.player.is_alive():
+                                print("Player has no lives left.")
+                                self.game_over()  # Call game over if player has no lives left
                         else:
                             print("Player has no lives left.")
-                        
-                        egg.isDisappear = True  # Mark as disappeared
-
-                        # Check if player is alive after losing life
-                        if not self.player.is_alive():
                             self.game_over()
+                            
+                        # Do not mark as disappeared immediately; let animation play first
+                        egg.isDisappear = True  
 
                 # Remove the egg from all sprites and enemy eggs if it should disappear
                 if egg.should_disappear():

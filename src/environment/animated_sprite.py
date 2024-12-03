@@ -159,7 +159,7 @@ class AnimatedSprite(pygame.sprite.Sprite):
             },
             "egg": {
                 "whole": {"speed": 0.1},
-                "broken": {"speed": 0.1}
+                "broken": {"speed": 0.2}
             },
             "heart": {
                 "full": {"speed": 0.2},

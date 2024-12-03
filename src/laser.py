@@ -6,7 +6,7 @@ from environment.sprite import StaticSprite
 class Laser(StaticSprite):
     def __init__(self, x, y):
         image_path = path.join("assets", "images", "bullet", "a1.png")
-        position = (x, y + 5)
+        position = (x - 3, y + 5)
         
         super().__init__(image_path, position)
         
