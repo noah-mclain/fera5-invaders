@@ -9,56 +9,10 @@ from random import choice
 from random import sample
 
 
-
-class ai_env:
-    def __init__(self, game):
-        self.player = game.player
-        self.enemies = game.enemies
-        self.score = 0
-        self.actions=["right", "left", "shoot", "stop"]  
-            
-    def available_actions(self):
-        available_actions = ["shoot", "stop"]
-        if self.player.rect.x < self.game.screen_width:
-            available_actions.append("left")
-        if self.player.rect.x > 0:
-            available_actions.append("right")
-    
-    def input_nodes(self):
-        player_nodes = 2
-        MAX_chicken_nodes = 40 * 2
-        MAX_egg_nodes = MAX_chicken_nodes
-        MAX_laser_nodes = 20
-        MAX_powerups_nodes = 6
-        total_nodes = player_nodes + MAX_chicken_nodes + MAX_egg_nodes + MAX_laser_nodes + MAX_powerups_nodes
-        return total_nodes
-
-    def get_state(self):
-        # Player position
-        # Chicken position
-        # Bullets position
-        # Egg position
-        # Powerups and their positions
-        # Fera5 matboo5a position
-        state = []
-        state.append(self.game.player.rect.x)
-        state.append(self.game.player.rect.y)
-        
-        for chicken in self.game.enemies:
-            state.append(chicken.rect.x)
-            state.append(chicken.rect.y)
-            for egg in chicken.eggs:
-                state.append(egg.rect.x)
-                state.append(egg.rect.y)
-
-        for laser in self.player.lasers:
-            state.append(laser.rect.x)
-            state.append(laser.rect.y)
-
-        return state
-        
-
 class AI:
+    """
+    initializing the AI model with its own replay buffer
+    """
     def __init__(self, environment, alpha, epsilon, model):
         self.environment = environment
         self.alpha = alpha
@@ -69,10 +23,13 @@ class AI:
         self.memory_capacity = 10000
         self.batch_size = 32
     
+    
+    """retrieves the input nodes from class ai_env"""
     def get_input_layer(self):
         self.input_nodes = self.environment.input_nodes()
         return self.input_nodes
     
+    """decides which action to take, expolit or explore, and the espilon's value decreases gradually to increase the probability of exploitation """
     def get_action(self):
         state = self.environment.get_state()
         state = np.array(state).reshape(1,-1)
@@ -92,9 +49,11 @@ class AI:
             
         return action
     
-
+    """
+    retrieves past experiences in batches, and uses the Q-values learnt from these experience to adjust the neural network's internal weights using back propagation
+    """
     def train(self, gamma):
-        if len(self.replay_memory < self.batch_size):
+        if len(self.replay_memory) < self.batch_size:
             return
         batch = sample(self.replay_memory, self.batch_size)
         states, actions, rewards, next_states, dones = zip(*batch)
@@ -114,41 +73,22 @@ class AI:
 
         
     # state, action, reward, next_state, done
+    """stores the experiences in the replay_memory list"""
     def store_experience(self, state, action, reward, next_state, done):
         if len(self.replay_memory) > self.memory_capacity:
             self.replay_memory.pop(0)
         self.replay_memory.append((state, action, reward, next_state, done))
-    
+        
+    """decreases the Epsilon's value gradually"""
     def update_epsilon(self):
         self.epsilon = max(0, self.epsilon - (self.epsilon * self.decay_rate))
 
+    
+    """methods to save and load the trained AI model """
     def save_model(self, file_path):
         self.model.save(file_path)
 
     def load_model(self, file_path):
         self.model.load(file_path)
-
-
-
-
-class DQNMODEL(tf.keras.Model):
-    def __init__(self, input_size, num_actions):
-        super(DQNMODEL, self).__init__()
-        self.dense1 = tf.keras.Model.layers.Dense(64, activation = 'relu', input_shape = (self.environment.input_nodes()))
-        self.dense2 = tf.keras.Model.layers.Dense(32, activation='relu')
-        self.dense3 = tf.keras.Model.layers.Dense(16, activation = 'relu')
-
-    def call(self, state):
-        x = self.dense1(state)
-        x = self.dense2(x)
-        return self.dense3(x)
-
-
-
-        
-
-        
-    
-    
 
     
