@@ -1,13 +1,15 @@
-# Game class handling game logic
-
-import pygame
 import random
 from os import path
 
-# Class imports
-from player import Player
+import pygame
+
 from enemy import Chicken
 from environment.heart import Heart
+from environment.sprite import StaticSprite
+# Class imports
+from player import Player
+from powerup import PowerUp  # Added to handle power-ups
+
 
 class Game:
     def __init__(self):
@@ -33,19 +35,9 @@ class Game:
             pygame.display.set_caption("Fera5 Invaders")
             
             self.running = True
+            self.paused = False  # Updated: Pause functionality
             self.score = 0
-            # Get current dimensions
-            info = pygame.display.Info()
-            self.screen_width = info.current_w
-            self.screen_height = info.current_h
-            
-            # Create screen
-            self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
-            pygame.display.set_caption("Fera5 Invaders")
-            
-            self.running = True
-            self.paused = False
-            self.score = 0
+            self.all_chickens_dead = False  # Added: To track when all chickens are dead
 
             # Create sprite groups
             self.all_sprites = pygame.sprite.Group()
@@ -73,7 +65,7 @@ class Game:
     def setup_enemy_grid(self):
         try:
             # Enemy grid configuration
-            self.num_of_enemies = 2
+            self.num_of_enemies = 30
             chicken_width = 40
             chicken_height = 35
             
@@ -120,7 +112,7 @@ class Game:
         except Exception as e:
             print(f"Error setting up enemy grid: {str(e)}")
             raise   
-        
+    
     def check_collisions(self):
         # Check laser collisions with enemies 
         for enemy in self.enemies.sprites():
@@ -132,6 +124,7 @@ class Game:
                         enemy.update(self.screen_width, self.screen_height)
                         self.score += 100
                     break
+
 
         # Flatten the list of eggs from all the enemies
         for enemy in self.enemies:
@@ -172,16 +165,51 @@ class Game:
                     self.all_sprites.remove(egg)  # Remove from all sprites group
 
 
+        # Added: Check if all chickens are dead
+        if Chicken.get_chicken_count() == 0 and not self.all_chickens_dead:
+            self.all_chickens_dead = True
+            self.handle_all_chickens_dead()
+
+    # Added: Handle actions when all chickens are dead
+    def handle_all_chickens_dead(self):
+        self.score += 10000
+        print("All chickens defeated! Respawning...")
+        self.player._play_powerup_effect()
+        self.setup_enemy_grid()
+        self.apply_chicken_flicker_effect()
+        powerup = PowerUp("increment_laser", laser_increment=1)
+        self.player.apply_powerup(powerup)
+
+        # Reset the flag for chicken respawn
+        self.all_chickens_dead = False
+
+    # Added: Flicker effect for chickens
+    def apply_chicken_flicker_effect(self):
+        """
+        Apply a flicker effect to all newly respawned chickens.
+        """
+        flicker_duration = 1500  # 1.5 seconds
+        flicker_interval = 100   # 100ms interval
+        start_time = pygame.time.get_ticks()
+
+        while pygame.time.get_ticks() - start_time < flicker_duration:
+            for chicken in self.enemies:
+                chicken.set_alpha(0)  # Make chickens invisible
+            pygame.time.delay(flicker_interval // 2)
+            for chicken in self.enemies:
+                chicken.set_alpha(255)  # Make chickens visible
+            pygame.time.delay(flicker_interval // 2)
+
     def game_over(self):
         self.running = False
-        # make this into a main menu b2a 
 
     def toggle_pause(self):
         self.paused = not self.paused
+
         
     def run(self):
         print("Game loop started.")
-        clock = pygame.time.Clock() # To keep the framerate consistent
+        clock = pygame.time.Clock()  # Keep framerate consistent
         while self.running:
             clock.tick(60)
             for event in pygame.event.get():
@@ -200,7 +228,7 @@ class Game:
                 if event.type == pygame.KEYUP:
                     if not self.paused and (event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT):
                         self.player.stop()
-                        
+
             # Update enemies
             if not self.enemies:
                 self.display_victory_message()
@@ -216,6 +244,7 @@ class Game:
                 pause_text = font.render("Game paused (Press P to resume)", True, (255,255,255))
                 self.screen.blit(pause_text, (self.screen.width // 2 - 200, self.screen_height // 2))
                 pygame.display.flip()
+
         
     def update_game_state(self):       
         # Update sprites
@@ -273,15 +302,14 @@ class Game:
         score_image_path = path.join("assets", "images", "scores1.png")  
         score_sheet = pygame.image.load(score_image_path).convert_alpha()
 
-        digit_width = score_sheet.get_width() // 10 
+        digit_width = score_sheet.get_width() // 10
         digit_height = score_sheet.get_height()
         digits = [score_sheet.subsurface(pygame.Rect(i * digit_width, 0, digit_width, digit_height)) for i in range(10)]
         score_str = str(self.score)
-        x_offset = 10 
-        y_offset = 10 
+        x_offset = 10
+        y_offset = 10
 
         for digit in score_str:
-            digit_surface = digits[int(digit)]  
+            digit_surface = digits[int(digit)]
             self.screen.blit(digit_surface, (x_offset, y_offset))
-            x_offset += digit_width + 2 
-    
+            x_offset += digit_width + 2

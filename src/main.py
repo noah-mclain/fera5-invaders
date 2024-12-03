@@ -13,6 +13,7 @@ def check_dependencies():
         "assets/images/Enemy/eggSpriteSheet.png",
         "assets/images/background/livesSpriteSheet.png"
     ]
+
     
     for file in required_files:
         try:
