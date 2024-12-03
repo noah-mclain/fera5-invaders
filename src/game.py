@@ -7,7 +7,7 @@ from os import path
 # Class imports
 from player import Player
 from enemy import Chicken
-from environment.sprite import StaticSprite
+from environment.heart import Heart
 
 class Game:
     def __init__(self):
@@ -56,7 +56,11 @@ class Game:
             self.player = Player(self.screen_width, self.screen_height)
             if not self.player:
                 raise RuntimeError("Failed to create player")
-                
+            
+            self.hearts = [Heart((self.screen_width - (i + 1) * 50, 10)) for i in range(self.player.lives)]           
+            for heart in self.hearts:
+                self.all_sprites.add(heart)
+                    
             self.all_sprites.add(self.player)
             
             # Enemy grid setup
@@ -115,15 +119,7 @@ class Game:
             
         except Exception as e:
             print(f"Error setting up enemy grid: {str(e)}")
-            raise
-    
-        # Creating Enemies
-        # self.num_of_enemies = 18
-        # self.enemies = []
-        # for i in range(self.num_of_enemies):
-        #     x = (i // 3) * 200 + 100
-        #     y = (i % 3) * 100 + 50
-        #     self.enemies.append(Chicken(x, y))     
+            raise   
         
     def check_collisions(self):
         # Check laser collisions with enemies 
@@ -135,20 +131,43 @@ class Game:
                     enemy.update(self.screen_width, self.screen_height)
                     self.score += 100
                     break
+
         # Flatten the list of eggs from all the enemies
-        for egg in [egg for enemy in self.enemies for egg in enemy.eggs]:
-            for laser in self.player.lasers[:]:
-                if laser.rect.colliderect(egg.rect):
-                    laser.engage()
-                    egg.breakEgg()
-                    self.all_sprites.remove(laser)
-                    break
-            for egg in enemy.eggs:
-                if egg.rect.colliderect(self.player.rect):
-                    self.player.lose_life()
-                    egg.isDisappear = True
-                    if not self.player.is_alive():
-                        self.game_over()
+        for enemy in self.enemies:
+            for egg in enemy.eggs[:]:  # Use a copy of the list to avoid modifying it during iteration
+                # Check if the egg is still active
+                if not egg.should_disappear():  # Use instance method
+                    # Check collision with lasers
+                    for laser in self.player.lasers[:]:
+                        if laser.rect.colliderect(egg.rect):
+                            laser.engage()
+                            egg.breakEgg()
+                            egg.isDisappear = True  # Mark as disappeared
+                            if laser in self.all_sprites:
+                                self.all_sprites.remove(laser)
+                            break
+                        
+                    # Check collision with player
+                    if egg.rect.colliderect(self.player.rect):
+                        if self.player.lose_life():
+                            # Trigger the flickering on that heart
+                            if len(self.hearts) > (self.player.lives):  
+                                print(f"Losing life: {self.player.lives}")
+                                self.hearts[self.player.lives].lose_life()
+                        else:
+                            print("Player has no lives left.")
+                        
+                        egg.isDisappear = True  # Mark as disappeared
+
+                        # Check if player is alive after losing life
+                        if not self.player.is_alive():
+                            self.game_over()
+
+                # Remove the egg from all sprites and enemy eggs if it should disappear
+                if egg.should_disappear():
+                    enemy.eggs.remove(egg)  # Remove from enemy's eggs list
+                    self.all_sprites.remove(egg)  # Remove from all sprites group
+
 
     def game_over(self):
         self.running = False
@@ -156,6 +175,7 @@ class Game:
 
     def toggle_pause(self):
         self.paused = not self.paused
+        
     def run(self):
         print("Game loop started.")
         clock = pygame.time.Clock() # To keep the framerate consistent
@@ -185,6 +205,7 @@ class Game:
                 
             
             if not self.paused:
+                self.check_collisions()
                 self.update_game_state()
                 self.render_game_state()
             else:
@@ -196,6 +217,10 @@ class Game:
     def update_game_state(self):       
         # Update sprites
             self.player.update(self.screen_width, self.screen_height)
+            
+            # Update player lives
+            for heart in self.hearts:
+                heart.update()
             
             # Update and add new lasers to sprite groups
             for laser in self.player.lasers:
@@ -219,28 +244,20 @@ class Game:
                     
             # Draw all sprites
             self.all_sprites.draw(self.screen)
-                
-            # Check collisions
-            self.check_collisions()
             
-    
     def render_game_state(self):
         self.screen.fill((0,0,0))
         self.player.draw(self.screen)
         
         self.all_sprites.draw(self.screen)
+        
+        for i in range(self.player.lives):
+            if i < len(self.hearts):
+                self.hearts[i].draw(self.screen)
             
-        self.render_lives()
         self.render_scores()
         pygame.display.flip()
         
-        
-    def render_lives(self):
-        heart_image = pygame.image.load("assets/images/background/heart.png")
-        heart_image = pygame.transform.scale(heart_image, (40, 40))
-        for i in range(self.player.lives):
-            self.screen.blit(heart_image, (self.screen_width - (i+1)*50, 10))
-
     def display_victory_message(self):
         font = pygame.font.Font(None, 72)
         victory_text = font.render("You Win!", True, (0, 255, 0))
@@ -250,7 +267,7 @@ class Game:
         pygame.time.delay(3000)  
 
     def render_scores(self):
-        score_image_path = "assets/images/scores1.png"  
+        score_image_path = path.join("assets", "images", "scores1.png")  
         score_sheet = pygame.image.load(score_image_path).convert_alpha()
 
         digit_width = score_sheet.get_width() // 10 

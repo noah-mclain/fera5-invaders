@@ -72,9 +72,11 @@ class Player(StaticSprite):
         self.alive = False
 
     def lose_life(self):
-        self.lives -= 1
-        self.flicker_timer = pygame.time.get_ticks()
-        
+        if self.lives > 0:
+            self.lives -= 1
+            print(f"Remaining lives: {self.lives}")
+            return True
+        return False   
         
     def is_alive(self):
         return self.lives > 0

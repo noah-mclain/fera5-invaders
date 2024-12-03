@@ -88,7 +88,25 @@ class AnimatedSprite(pygame.sprite.Sprite):
                     ],
                     "scale": 1,
                 }     
-            }
+            },
+            "heart": {
+                "full": {
+                    "width": 15,
+                    "height": 16,
+                    "frames": [
+                        {"x": 0, "y": 0, "width": 15, "height": 16},
+                    ],
+                    "scale": 1,
+                },
+                "empty": {
+                    "width": 15,
+                    "height": 16,
+                    "frames": [
+                        {"x": 16, "y": 0, "width": 15, "height": 16},
+                    ],
+                    "scale": 1,
+                },
+            },
         }
         
         data = sprite_data.get(sprite_type)
@@ -140,7 +158,12 @@ class AnimatedSprite(pygame.sprite.Sprite):
                 "food": {"speed": 0.5}
             },
             "egg": {
-                "whole": {"speed": 0.1}
+                "whole": {"speed": 0.1},
+                "broken": {"speed": 0.1}
+            },
+            "heart": {
+                "full": {"speed": 0.2},
+                "empty": {"speed": 0.2}
             }
         }
         
