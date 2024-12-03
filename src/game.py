@@ -1,5 +1,3 @@
-# Game class handling game logic
-
 import pygame
 import random
 from os import path
@@ -8,6 +6,7 @@ from os import path
 from player import Player
 from enemy import Chicken
 from environment.sprite import StaticSprite
+from powerup import PowerUp  # Added to handle power-ups
 
 class Game:
     def __init__(self):
@@ -33,19 +32,9 @@ class Game:
             pygame.display.set_caption("Fera5 Invaders")
             
             self.running = True
+            self.paused = False  # Updated: Pause functionality
             self.score = 0
-            # Get current dimensions
-            info = pygame.display.Info()
-            self.screen_width = info.current_w
-            self.screen_height = info.current_h
-            
-            # Create screen
-            self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
-            pygame.display.set_caption("Fera5 Invaders")
-            
-            self.running = True
-            self.paused = False
-            self.score = 0
+            self.all_chickens_dead = False  # Added: To track when all chickens are dead
 
             # Create sprite groups
             self.all_sprites = pygame.sprite.Group()
@@ -69,7 +58,7 @@ class Game:
     def setup_enemy_grid(self):
         try:
             # Enemy grid configuration
-            self.num_of_enemies = 2
+            self.num_of_enemies = 30
             chicken_width = 40
             chicken_height = 35
             
@@ -117,14 +106,6 @@ class Game:
             print(f"Error setting up enemy grid: {str(e)}")
             raise
     
-        # Creating Enemies
-        # self.num_of_enemies = 18
-        # self.enemies = []
-        # for i in range(self.num_of_enemies):
-        #     x = (i // 3) * 200 + 100
-        #     y = (i % 3) * 100 + 50
-        #     self.enemies.append(Chicken(x, y))     
-        
     def check_collisions(self):
         # Check laser collisions with enemies 
         for enemy in self.enemies.sprites():
@@ -135,6 +116,7 @@ class Game:
                     enemy.update(self.screen_width, self.screen_height)
                     self.score += 100
                     break
+
         # Flatten the list of eggs from all the enemies
         for egg in [egg for enemy in self.enemies for egg in enemy.eggs]:
             for laser in self.player.lasers[:]:
@@ -150,15 +132,61 @@ class Game:
                     if not self.player.is_alive():
                         self.game_over()
 
+        # Added: Check if all chickens are dead
+        if Chicken.get_chicken_count() == 0 and not self.all_chickens_dead:
+            self.all_chickens_dead = True
+            self.handle_all_chickens_dead()
+
+    # Added: Handle actions when all chickens are dead
+    def handle_all_chickens_dead(self):
+        """
+        - Increment score by 10,000.
+        - Respawn chickens with flicker effect.
+        - Increment player's power-up.
+        """
+        self.score += 10000
+        print("All chickens defeated! Respawning...")
+
+        # Apply flicker effect to the player
+        self.player._play_powerup_effect()
+
+        # Respawn new chickens
+        self.setup_enemy_grid()
+        self.apply_chicken_flicker_effect()
+
+        # Increment player's power-up (laser count)
+        powerup = PowerUp("increment_laser", laser_increment=1)
+        self.player.apply_powerup(powerup)
+
+        # Reset the flag for chicken respawn
+        self.all_chickens_dead = False
+
+    # Added: Flicker effect for chickens
+    def apply_chicken_flicker_effect(self):
+        """
+        Apply a flicker effect to all newly respawned chickens.
+        """
+        flicker_duration = 1500  # 1.5 seconds
+        flicker_interval = 100   # 100ms interval
+        start_time = pygame.time.get_ticks()
+
+        while pygame.time.get_ticks() - start_time < flicker_duration:
+            for chicken in self.enemies:
+                chicken.set_alpha(0)  # Make chickens invisible
+            pygame.time.delay(flicker_interval // 2)
+            for chicken in self.enemies:
+                chicken.set_alpha(255)  # Make chickens visible
+            pygame.time.delay(flicker_interval // 2)
+
     def game_over(self):
         self.running = False
-        # make this into a main menu b2a 
 
     def toggle_pause(self):
         self.paused = not self.paused
+
     def run(self):
         print("Game loop started.")
-        clock = pygame.time.Clock() # To keep the framerate consistent
+        clock = pygame.time.Clock()  # Keep framerate consistent
         while self.running:
             clock.tick(60)
             for event in pygame.event.get():
@@ -178,90 +206,58 @@ class Game:
                     if not self.paused and (event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT):
                         self.player.stop()
                         
-            # Update enemies
-            if not self.enemies:
-                self.display_victory_message()
-                self.running = False
-                
-            
             if not self.paused:
                 self.update_game_state()
                 self.render_game_state()
-            else:
-                font = pygame.font.Font(None, 48)
-                pause_text = font.render("Game paused (Press P to resume)", True, (255,255,255))
-                self.screen.blit(pause_text, (self.screen.width // 2 - 200, self.screen_height // 2))
-                pygame.display.flip()
-        
-    def update_game_state(self):       
-        # Update sprites
-            self.player.update(self.screen_width, self.screen_height)
-            
-            # Update and add new lasers to sprite groups
-            for laser in self.player.lasers:
-                if laser not in self.all_sprites:
-                    self.all_sprites.add(laser)
-                    self.lasers.add(laser)
-                laser.update(self.screen_width, self.screen_height)
-            
-            # Remove dead lasers from sprite groups
-            for laser in self.lasers.copy():
-                if not laser.is_fired:
-                    self.all_sprites.remove(laser)
-                    self.lasers.remove(laser)
 
-            for enemy in self.enemies:
-                enemy.update(self.screen_width, self.screen_height)
-                if enemy.current_state == "alive":
-                     # Laying those eggs
-                    if random.random() < 0.01:
-                        enemy.lay_eggs(self.all_sprites)
-                    
-            # Draw all sprites
-            self.all_sprites.draw(self.screen)
-                
-            # Check collisions
-            self.check_collisions()
-            
-    
-    def render_game_state(self):
-        self.screen.fill((0,0,0))
-        self.player.draw(self.screen)
-        
+    def update_game_state(self):
+        self.player.update(self.screen_width, self.screen_height)
+
+        for laser in self.player.lasers:
+            if laser not in self.all_sprites:
+                self.all_sprites.add(laser)
+                self.lasers.add(laser)
+            laser.update(self.screen_width, self.screen_height)
+
+        for laser in self.lasers.copy():
+            if not laser.is_fired:
+                self.all_sprites.remove(laser)
+                self.lasers.remove(laser)
+
+        for enemy in self.enemies:
+            enemy.update(self.screen_width, self.screen_height)
+            if enemy.current_state == "alive" and random.random() < 0.01:
+                enemy.lay_eggs(self.all_sprites)
+
         self.all_sprites.draw(self.screen)
-            
+        self.check_collisions()
+
+    def render_game_state(self):
+        self.screen.fill((0, 0, 0))
+        self.player.draw(self.screen)
+        self.all_sprites.draw(self.screen)
         self.render_lives()
         self.render_scores()
         pygame.display.flip()
-        
-        
+
     def render_lives(self):
         heart_image = pygame.image.load("assets/images/background/heart.png")
         heart_image = pygame.transform.scale(heart_image, (40, 40))
         for i in range(self.player.lives):
-            self.screen.blit(heart_image, (self.screen_width - (i+1)*50, 10))
-
-    def display_victory_message(self):
-        font = pygame.font.Font(None, 72)
-        victory_text = font.render("You Win!", True, (0, 255, 0))
-        self.screen.fill((0, 0, 0))
-        self.screen.blit(victory_text, (self.screen_width // 2 - 100, self.screen_height // 2))
-        pygame.display.flip()
-        pygame.time.delay(3000)  
+            self.screen.blit(heart_image, (self.screen_width - (i + 1) * 50, 10))
 
     def render_scores(self):
-        score_image_path = "assets/images/scores1.png"  
+        score_image_path = "assets/images/scores1.png"
         score_sheet = pygame.image.load(score_image_path).convert_alpha()
 
-        digit_width = score_sheet.get_width() // 10 
+        digit_width = score_sheet.get_width() // 10
         digit_height = score_sheet.get_height()
         digits = [score_sheet.subsurface(pygame.Rect(i * digit_width, 0, digit_width, digit_height)) for i in range(10)]
         score_str = str(self.score)
-        x_offset = 10 
-        y_offset = 10 
+        x_offset = 10
+        y_offset = 10
 
         for digit in score_str:
-            digit_surface = digits[int(digit)]  
+            digit_surface = digits[int(digit)]
             self.screen.blit(digit_surface, (x_offset, y_offset))
-            x_offset += digit_width + 2 
-    
+            x_offset += digit_width + 2

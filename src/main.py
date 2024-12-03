@@ -11,7 +11,7 @@ def check_dependencies():
         "assets/images/shipDie.png",
         "assets/images/Enemy/chickenRedSpriteSheet.png",
         "assets/images/Enemy/eggSpriteSheet.png"
-    ]
+    ]         
     
     for file in required_files:
         try:
