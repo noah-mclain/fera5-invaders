@@ -10,7 +10,7 @@ class Chicken(AnimatedSprite):
     def __init__(self, position, sprite_sheet_path):
         super().__init__(position, sprite_sheet_path, sprite_type="chicken", initial_state="alive")
         self.isChickenAlive = True
-        self.speed_x = 2
+        self.speed_x = 5
         self.direction = 1
         self.x, self.y = position
         self.eggs = []
@@ -113,3 +113,5 @@ class Chicken(AnimatedSprite):
         print(f"Laying egg at position: ({egg_x}, {egg_y})")  
         return Egg(egg_x, egg_y)
     
+    def set_alpha(self, alpha_value):
+        self.image.set_alpha(alpha_value)
