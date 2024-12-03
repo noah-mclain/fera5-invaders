@@ -45,7 +45,7 @@ class AnimatedSprite(pygame.sprite.Sprite):
                     "frames": [
                         {"x": i * 40, "y": 0} for i in range(10)  # Generates frames with x positions
                     ],
-                    "scale": 1
+                    "scale": 1.5
                 },
                 "dead": {
                     "width": 45,
