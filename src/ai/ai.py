@@ -16,8 +16,7 @@ class ai_env:
         self.enemies = game.enemies
         self.score = 0
         self.actions=["right", "left", "shoot", "stop"]  
-        
-               
+            
     def available_actions(self):
         available_actions = ["shoot", "stop"]
         if self.player.rect.x < self.game.screen_width:
@@ -58,10 +57,6 @@ class ai_env:
 
         return state
         
-            
-
-
-
 
 class AI:
     def __init__(self, environment, alpha, epsilon, model):
@@ -94,7 +89,7 @@ class AI:
             actions = self.environment.available_actions()
             action_index = np.argmax(q_values[0])
             action = actions[action_index]
-
+            
         return action
     
 
