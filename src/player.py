@@ -15,7 +15,9 @@ class Player(StaticSprite):
         self.screen_width = screen_width
         self.screen_height = screen_height
         self.laser_count = 1 
-        self.rect = self.image.get_rect(midbottom=(screen_width // 2, screen_height - 20))
+        self.laser_type = 0
+        self.laser_count = 1
+        # self.rect = self.image.get_rect(midbottom=(screen_width // 2, screen_height - 20))
         self.sprite_path_format = path.join("assets", "images", "ship{}.png")
         initial_image_path = self.sprite_path_format.format(self.laser_count)
         size = (50, 50)
@@ -43,11 +45,16 @@ class Player(StaticSprite):
 
     def shoot(self):
         print(f"Shooting {self.laser_count} lasers!")
-        if len(self.lasers) < self.powerup_effects.get("laser_increment", 1):
-            offset = i - (self.laser_count // 2)  
-            laser = Laser(self.rect.x + offset * 10, self.rect.y)
-            laser.fire()
-            self.lasers.append(laser)
+        if len(self.lasers) < self.laser_count:
+            laser_spacing = 15
+            total_width = laser_spacing * (self.laser_count -1)
+            start_x = self.rect.centerx - (total_width //2)
+
+            for i in range(self.laser_count):
+                laser_x = start_x + i * laser_spacing
+                laser = Laser(laser_x, self.rect.top, self.laser_type)
+                laser.fire()
+                self.lasers.append(laser)
 
     def fired_lasers(self):
         self.lasers = [laser for laser in self.lasers if laser.is_fired]
@@ -67,8 +74,8 @@ class Player(StaticSprite):
             laser.draw(screen)
             
         if self.is_animating_powerup:
-            self.powerup_animation.update()
-            self.powerup_animation.draw(screen)
+            self.powerup_animation.update(pygame.time.get_ticks())
+            self.powerup_animation.draw(screen, self.rect.center)
             if self.powerup_animation.animation_finished:
                 self.is_animating_powerup = False
         else:
@@ -83,10 +90,10 @@ class Player(StaticSprite):
         elif self.rect.x > self.screen_width - self.rect.width:
             self.rect.x = self.screen_width - self.rect.width
         keys = pygame.key.get_pressed()
-        if keys[pygame.K_LEFT]:
-            self.rect.x -= self.speed
-        if keys[pygame.K_RIGHT]:
-            self.rect.x += self.speed
+        # if keys[pygame.K_LEFT]:
+        #     self.rect.x -= self.speed
+        # if keys[pygame.K_RIGHT]:
+        #     self.rect.x += self.speed
 
         self.rect.clamp_ip(pygame.Rect(0, 0, 1920, 1080))
         for laser in self.lasers[:]:
@@ -114,8 +121,13 @@ class Player(StaticSprite):
         return self.lives > 0
 
     def apply_powerup(self, powerup):
-        powerup.apply(self)
+        #powerup.apply(self)
+        if powerup.type == "increment_laser":
+            self.laser_count += powerup.laser_increment
+        elif powerup.type == "change_laser":
+            self.laser_type = powerup.laser_type
         self._trigger_powerup_animation()
+        self._play_powerup_effect()
 
 
 
@@ -132,4 +144,4 @@ class Player(StaticSprite):
 
     def _play_powerup_effect(self):
         print("Power-up activated!")
-        #play it 
+        self.powerup_sound.play()

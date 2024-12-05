@@ -18,7 +18,7 @@ class Heart(AnimatedSprite):
         if self.current_state == "full":
             print("Heart is flickering")
             self.flickering = True
-            self.flicker_count = 3
+            self.flicker_count = 4
             self.play_animation("full", loop=False)
             
 

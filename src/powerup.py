@@ -2,28 +2,21 @@ import pygame
 from os import path
 
 
-class PowerUp:
-    def __init__(self, powerup_type, laser_increment, sound_path="assets/sounds/powerup_woosh.mp3"):
-        self.powerup_type = powerup_type
+class PowerUp(pygame.sprite.Sprite):
+    def __init__(self, powerup_type, laser_increment=0, laser_type=0):
+        super().__init__()
+        self.image = pygame.image.load("assets/images/powerup/powerup.png").convert_alpha()
+        self.rect = self.image.get_rect()
+        self.type = powerup_type
         self.laser_increment = laser_increment
-        self.sound = pygame.mixer.Sound(sound_path) 
+        self.laser_type = laser_type
 
     def apply(self, player):
-        player.laser_count += self.laser_increment
-        self._play_sound()
-        self._trigger_visual_effect(player)
-        player._update_sprite_for_laser_count()
-
-    def _play_sound(self):
-        self.sound.play()
-
-    def _trigger_visual_effect(self, player):
-        flicker_duration = 1500
-        flicker_interval = 100
-        start_time = pygame.time.get_ticks()
-
-        while pygame.time.get_ticks() - start_time < flicker_duration:
-            player.sprite.set_alpha(0)
-            pygame.time.delay(flicker_interval // 2)
-            player.sprite.set_alpha(255)
-            pygame.time.delay(flicker_interval // 2)
+        if self.type == "increment_laser":
+            player.laser_count += self.laser_increment
+            print(f"Laser count increased to {self.laser_count}!")
+        elif self.type == "change_laser":
+            player.laser_type = self.laser_type
+            print(f"Laser type changed to {self.laser_type}!")
+        self._trigger_powerup_animation()
+        self._play_powerup_effect()

@@ -4,9 +4,12 @@ from environment.sprite import StaticSprite
 
 # Laser class for shooting mechanics
 class Laser(StaticSprite):
-    def __init__(self, x, y):
-        image_path = path.join("assets", "images", "bullet", "a1.png")
-        powerup_1 = path.join("assets", "images", "bullet", "b1.png")
+    def __init__(self, x, y, laser_type=0):
+        image_paths = [
+            path.join("assets", "images", "bullet", "a1.png"),  # Yellow laser
+            path.join("assets", "images", "bullet", "b1.png")   # Red laser
+        ]
+        image_path = image_paths[laser_type] if laser_type in (0, 1) else image_paths[0]
         position = (x - 3, y + 5)
         
         super().__init__(image_path, position)

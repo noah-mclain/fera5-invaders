@@ -25,7 +25,7 @@ def check_dependencies():
     return True
 
 def main():
-    game = None
+    game = None   
     try:
         print("Checking dependencies...")
         if not check_dependencies():

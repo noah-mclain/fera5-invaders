@@ -248,7 +248,6 @@ class Game:
             if not self.paused:
                 self.check_collisions()
                 self.update_game_state()
-                self.all_sprites.update()
                 self.render_game_state()
             else:
                 font = pygame.font.Font(None, 48)
