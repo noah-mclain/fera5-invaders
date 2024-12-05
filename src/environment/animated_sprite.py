@@ -6,6 +6,7 @@ from environment.animation_sequence import AnimationSequence
 class AnimatedSprite(pygame.sprite.Sprite):
     def __init__(self, position, sprite_sheet_path, sprite_type="chicken", initial_state="alive"):
         super().__init__()
+        self.animation_done = False
         
         try:
             # Load sprite sheet
@@ -31,6 +32,7 @@ class AnimatedSprite(pygame.sprite.Sprite):
             self.current_animation = None
             self.previous_animation = None
             
+            self.last_update_time = pygame.time.get_ticks()
         except Exception as e:
             print(f"Error initializing AnimatedSprite: {str(e)}")
             raise
@@ -212,10 +214,19 @@ class AnimatedSprite(pygame.sprite.Sprite):
 
     def update(self):
         """Update the sprite's animation"""
+        current_time = pygame.time.get_ticks()
         if self.current_animation:
             current_anim = self.animations[self.current_animation]
             if current_anim.is_playing:
-                self.image = current_anim.update(pygame.time.get_ticks())
+                if current_time - self.last_update_time > current_anim.animation_speed * 1000:
+                    self.image = current_anim.update(pygame.time.get_ticks())
+                    self.last_update_time = current_time
             elif not current_anim.loop:
                 # If animation is done and not looping, keep the last frame
                 self.image = current_anim.frames[current_anim.frame_index]
+                self.animation_done = True
+                
+            
+
+    def isAnimationDone(self):
+        return self.animation_done

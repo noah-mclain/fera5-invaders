@@ -52,23 +52,30 @@ class Chicken(AnimatedSprite):
             if screenHeight and self.rect.top > screenHeight:
                 self._remove_sprite()
                 
-        for egg in self.eggs:
+        for egg in list(self.eggs):
             egg.update(screenHeight)
             
+            if egg.should_disappear():
+                egg._remove_sprite()
+            
         # Remove any eggs that have disappeared
-        self.eggs = [egg for egg in self.eggs if not egg.should_disappear()]
+        #self.eggs = [egg for egg in self.eggs if not egg.should_disappear()]
         
         # Always update the current animation
         super().update()
         
     def eggDisappear(self):
-        aliveEggs=[]
+        aliveEggs = []
         
         for egg in self.eggs:
-            if egg.shouldDisappear()== False:
+            if egg.shouldDisappear() == False or egg.isBreaking == True:
                 aliveEggs.append(egg)
+            if egg.super().isAnimationDone():
+                aliveEggs.remove(egg)
+            #elif egg.rect.bottom <= self.screenHeight:
+                #aliveEggs.append(egg)
         #waw!        
-        self.eggs=aliveEggs
+        self.eggs = aliveEggs
     
     def killChicken(self):
         """Handle chicken death."""

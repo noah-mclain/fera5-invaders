@@ -15,7 +15,7 @@ class Player(StaticSprite):
         self.screen_width = screen_width
         self.screen_height = screen_height
         self.laser_count = 1 
-
+        self.rect = self.image.get_rect(midbottom=(screen_width // 2, screen_height - 20))
         self.sprite_path_format = path.join("assets", "images", "ship{}.png")
         initial_image_path = self.sprite_path_format.format(self.laser_count)
         size = (50, 50)
@@ -34,15 +34,16 @@ class Player(StaticSprite):
         super().__init__(initial_image_path, position, size)
 
         self.speed = 0
-        self.max_speed = 5
+        self.max_speed = 8
         self.alive = True
         self.lasers = []
         self.lives = 3
         self.flicker_timer = 0
+        self.powerup_effects={}
 
     def shoot(self):
         print(f"Shooting {self.laser_count} lasers!")
-        for i in range(self.laser_count):
+        if len(self.lasers) < self.powerup_effects.get("laser_increment", 1):
             offset = i - (self.laser_count // 2)  
             laser = Laser(self.rect.x + offset * 10, self.rect.y)
             laser.fire()
@@ -81,6 +82,17 @@ class Player(StaticSprite):
             self.rect.x = 0
         elif self.rect.x > self.screen_width - self.rect.width:
             self.rect.x = self.screen_width - self.rect.width
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_LEFT]:
+            self.rect.x -= self.speed
+        if keys[pygame.K_RIGHT]:
+            self.rect.x += self.speed
+
+        self.rect.clamp_ip(pygame.Rect(0, 0, 1920, 1080))
+        for laser in self.lasers[:]:
+            laser.update()
+            if laser.rect.bottom < 0:
+                self.lasers.remove(laser)
 
         self.fired_lasers()
         for laser in self.lasers:
@@ -117,3 +129,7 @@ class Player(StaticSprite):
     def _trigger_powerup_animation(self):
         print("Triggering powerup animation!")
         self.is_animating_powerup = True
+
+    def _play_powerup_effect(self):
+        print("Power-up activated!")
+        #play it 

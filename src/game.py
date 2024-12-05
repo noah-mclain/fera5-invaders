@@ -49,7 +49,7 @@ class Game:
             if not self.player:
                 raise RuntimeError("Failed to create player")
             
-            self.hearts = [Heart((self.screen_width - (i + 1) * 50, 10)) for i in range(self.player.lives)]           
+            self.hearts = [Heart((self.screen_width - (i + 1) * 60, 10)) for i in range(self.player.lives)]           
             for heart in self.hearts:
                 self.all_sprites.add(heart)
                     
@@ -66,8 +66,8 @@ class Game:
         try:
             # Enemy grid configuration
             self.num_of_enemies = 30
-            chicken_width = 40
-            chicken_height = 35
+            chicken_width = 50
+            chicken_height = 45
             
             # Calculate grid layout
             columns = max(1, (self.screen_width // chicken_width) - 2)
@@ -75,7 +75,7 @@ class Game:
             
             # Calculate spacing
             spacing_x = self.screen_width / (columns + 1)
-            spacing_y = (self.screen_height / 3) / (rows + 1)
+            spacing_y = (self.screen_height / 4) / (rows + 1)
             
             print(f"Creating enemy grid: {columns}x{rows}")
             print(f"Spacing: {spacing_x}x{spacing_y}")
@@ -157,7 +157,8 @@ class Game:
                             self.game_over()
                             
                         # Do not mark as disappeared immediately; let animation play first
-                        egg.isDisappear = True  
+                        #egg.isDisappear = True
+                        egg.breakEgg()  
 
                 # Remove the egg from all sprites and enemy eggs if it should disappear
                 if egg.should_disappear():
@@ -201,6 +202,15 @@ class Game:
             pygame.time.delay(flicker_interval // 2)
 
     def game_over(self):
+        ##YA MALAAAAKAKKK WRITE HERE THE LOGIC FOR THE EXIT MENUUU
+        ##le7ad ma teegy ha7ot replacement code 
+        font = pygame.font.Font(None, 72)
+        message = "Game Over!" if self.player.lives == 0 else "You Win!"
+        text = font.render(message, True, (255, 0, 0))
+        self.screen.fill((0, 0, 0))
+        self.screen.blit(text, (self.screen_width // 2 - 100, self.screen_height // 2))
+        pygame.display.flip()
+        pygame.time.delay(3000)
         self.running = False
 
     def toggle_pause(self):
@@ -238,6 +248,7 @@ class Game:
             if not self.paused:
                 self.check_collisions()
                 self.update_game_state()
+                self.all_sprites.update()
                 self.render_game_state()
             else:
                 font = pygame.font.Font(None, 48)
