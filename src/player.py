@@ -31,7 +31,7 @@ class Player(StaticSprite):
         print("SPRITE FOUND")
         
         self.powerup_animation = AnimationSequence(
-            [sprite_sheet.get_image_at_pos(i * 64, 0, 64, 64, scale=2) for i in range(30)],
+            [sprite_sheet.get_image_at_pos(i * 64, 0, 64, 64, scale=1.5) for i in range(30)],
             animation_speed=0.1
         )
         self.is_animating_powerup = False
@@ -48,14 +48,19 @@ class Player(StaticSprite):
 
     def shoot(self):
         if len(self.lasers) < self.laser_count:
+            total_spread = 60  # Total spread angle in degrees (adjust as desired)
+            if self.laser_count == 1:
+                angles = [0]  # Single laser shoots straight up
+            else:
+                step = total_spread / (self.laser_count - 1)
+                angles = [-total_spread / 2 + i * step for i in range(self.laser_count)]
+            
             laser_spacing = 15  # Distance between lasers
-            angle_offset = 10   # Angle offset for lasers
             total_width = laser_spacing * (self.laser_count - 1)
             start_x = self.rect.centerx - (total_width // 2)
 
-            for i in range(self.laser_count):
+            for i, angle in enumerate(angles):
                 laser_x = start_x + i * laser_spacing
-                angle = (i - (self.laser_count // 2)) * angle_offset 
                 laser_type = 1 if self.laser_count >= 3 else 0  
                 laser = Laser(laser_x, self.rect.top, laser_type, angle)
                 laser.fire()
@@ -148,6 +153,7 @@ class Player(StaticSprite):
     def _trigger_powerup_animation(self):
         print("Triggering powerup animation!")
         self.is_animating_powerup = True
+        self.powerup_animation.play(loop = False)
 
     def _play_powerup_effect(self):
         print("Power-up activated!")
