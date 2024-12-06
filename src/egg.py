@@ -14,6 +14,7 @@ class Egg(AnimatedSprite):
         self.current_state = "whole"
         self.is_egg_whole = True
         self.isBreaking = False
+        self.time_hit_ground = 0
         
         self.play_animation("whole", loop=False)
     
@@ -24,23 +25,26 @@ class Egg(AnimatedSprite):
         #if egg hits bottom of screen
         if self.rect.bottom > screenHeight:
             self.rect.bottom = screenHeight
+            if self.time_hit_ground == 0:
+                self.time_hit_ground = pygame.time.get_ticks()
             # self.isDisappear = True
 
             if not self.isBreaking:
                 self.breakEgg()
+                
             
         # If the egg is breaking, check that the animation is complete
         if self.isBreaking:
-            current_time = pygame.time.get_ticks()
             super().update()
-            
-            if super().isAnimationDone():
-                self.isDisappear = True
-          
-                if self.isDisappear:
+            current_time = pygame.time.get_ticks()
+            if self.time_hit_ground != 0:
+                elapsed_time = current_time - self.time_hit_ground
+                if elapsed_time > 3000:
                     self._remove_sprite()
+            
                   
     def breakEgg(self):
+        self.isBreaking = True
         if self.current_state == "whole":
             self.is_egg_whole = False
             self.current_state = "broken"
