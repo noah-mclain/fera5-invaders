@@ -5,7 +5,7 @@ from os import path
 class PowerUp(pygame.sprite.Sprite):
     def __init__(self, powerup_type, laser_increment=0, laser_type=0):
         super().__init__()
-        self.image = pygame.image.load("assets/images/powerup/powerup.png").convert_alpha()
+        self.image = pygame.image.load("assets/images/powerups/atomic-powerup.png").convert_alpha()
         self.rect = self.image.get_rect()
         self.type = powerup_type
         self.laser_increment = laser_increment

@@ -26,10 +26,13 @@ class Player(StaticSprite):
         self.sprite = pygame.image.load(initial_image_path).convert_alpha()
         self.powerup_sound = pygame.mixer.Sound("assets/sounds/take-off-36682.mp3")
 
-        powerup_sprite_sheet_path = path.join("assets", "images","powerups", "atomic-powerup.png")
+        powerup_sprite_sheet_path = path.join("assets", "images","powerups", "powerup.png")
         sprite_sheet = SpriteSheet(pygame.image.load(powerup_sprite_sheet_path).convert_alpha())
+        print("SPRITE FOUND")
+        
         self.powerup_animation = AnimationSequence(
-            [sprite_sheet.get_image_at_pos(i * 32, 0, 32, 32) for i in range(30)], animation_speed=0.1
+            [sprite_sheet.get_image_at_pos(i * 64, 0, 64, 64, scale=2) for i in range(30)],
+            animation_speed=0.1
         )
         self.is_animating_powerup = False
         
@@ -44,17 +47,20 @@ class Player(StaticSprite):
         self.powerup_effects={}
 
     def shoot(self):
-        print(f"Shooting {self.laser_count} lasers!")
         if len(self.lasers) < self.laser_count:
-            laser_spacing = 15
-            total_width = laser_spacing * (self.laser_count -1)
-            start_x = self.rect.centerx - (total_width //2)
+            laser_spacing = 15  # Distance between lasers
+            angle_offset = 10   # Angle offset for lasers
+            total_width = laser_spacing * (self.laser_count - 1)
+            start_x = self.rect.centerx - (total_width // 2)
 
             for i in range(self.laser_count):
                 laser_x = start_x + i * laser_spacing
-                laser = Laser(laser_x, self.rect.top, self.laser_type)
+                angle = (i - (self.laser_count // 2)) * angle_offset 
+                laser_type = 1 if self.laser_count >= 3 else 0  
+                laser = Laser(laser_x, self.rect.top, laser_type, angle)
                 laser.fire()
                 self.lasers.append(laser)
+
 
     def fired_lasers(self):
         self.lasers = [laser for laser in self.lasers if laser.is_fired]
@@ -77,9 +83,10 @@ class Player(StaticSprite):
             self.powerup_animation.update(pygame.time.get_ticks())
             self.powerup_animation.draw(screen, self.rect.center)
             if self.powerup_animation.animation_finished:
-                self.is_animating_powerup = False
+                self.is_animating_powerup = False 
         else:
-            screen.blit(self.image, self.rect)
+            screen.blit(self.image, self.rect) 
+        
         for laser in self.lasers:
             laser.draw(screen)
 

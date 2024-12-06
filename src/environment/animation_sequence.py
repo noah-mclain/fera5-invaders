@@ -8,14 +8,41 @@ class AnimationSequence:
         self.loop = True
         self.callback = None
         self.animation_finished = False
-    
+        self.image = self.frames[self.frame_index]
+
     def play(self, loop=True):
-        """Start playing the animation sequence"""
         self.is_playing = True
         self.loop = loop
         self.frame_index = 0
         self.animation_finished = False
-    
+
+    def update(self, current_time):
+        """Update the current animation frame."""
+        if not self.is_playing:
+            return
+        if current_time - self.last_update > self.animation_speed * 1000:
+            self.last_update = current_time
+            if self.frame_index < len(self.frames) - 1:
+                self.frame_index += 1
+            else:
+                if self.loop:
+                    self.frame_index = 0
+                else:
+                    self.animation_finished = True
+                    if self.callback:
+                        self.callback()
+        if 0 <= self.frame_index < len(self.frames):
+            return self.frames[self.frame_index]
+        else:
+            print(f"Warning: Invalid frame index {self.frame_index}. Total frames: {len(self.frames)}")
+            return None  # Or handle accordingly
+
+    def draw(self, screen, position):
+        """Draw the current frame at the given position."""
+        if 0 <= self.frame_index < len(self.frames):
+            frame = self.frames[self.frame_index]
+            frame_rect = frame.get_rect(center=position)
+            screen.blit(frame, frame_rect)
     def stop(self):
         """Stop the animation sequence"""
         self.is_playing = False
@@ -24,30 +51,3 @@ class AnimationSequence:
     def pause(self):
         """Pause the animation sequence"""
         self.is_playing = False
-    
-    def update(self, current_time):
-        """Update the animation frame"""
-        if not self.is_playing:
-            return self.frames[self.frame_index] if self.frames else None
-            
-        if current_time - self.last_update > self.animation_speed * 1000:
-            self.last_update = current_time
-            
-            # Move to next frame
-            if self.frame_index < len(self.frames) - 1:
-                self.frame_index += 1
-            else:
-                if self.loop:
-                    self.frame_index = 0  # Reset to first frame for looping animations
-                else:
-                    # For non-looping animations, stay on last frame
-                    self.animation_finished = True
-                    if self.callback:
-                        self.callback()
-                        
-        # Make sure frame_index is valid before accessing
-        if 0 <= self.frame_index < len(self.frames):
-            return self.frames[self.frame_index]
-        else:
-            print(f"Warning: Invalid frame index {self.frame_index}. Total frames: {len(self.frames)}")
-            return None  # Or handle accordingly

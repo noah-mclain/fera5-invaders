@@ -43,12 +43,11 @@ class Game:
             self.all_sprites = pygame.sprite.Group()
             self.enemies = pygame.sprite.Group()
             self.lasers = pygame.sprite.Group()
-            
-            # Create static sprite
+           
             self.player = Player(self.screen_width, self.screen_height)
             if not self.player:
                 raise RuntimeError("Failed to create player")
-            
+
             self.hearts = [Heart((self.screen_width - (i + 1) * 60, 10)) for i in range(self.player.lives)]           
             for heart in self.hearts:
                 self.all_sprites.add(heart)
@@ -124,7 +123,6 @@ class Game:
                         enemy.update(self.screen_width, self.screen_height)
                         self.score += 100
                     break
-
 
         # Flatten the list of eggs from all the enemies
         for enemy in self.enemies:
@@ -219,9 +217,11 @@ class Game:
         
     def run(self):
         print("Game loop started.")
-        clock = pygame.time.Clock()  # Keep framerate consistent
+        clock = pygame.time.Clock() 
+        
         while self.running:
             clock.tick(60)
+            #keys = pygame.key.get_pressed()
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.running = False
@@ -285,6 +285,10 @@ class Game:
                         enemy.lay_eggs(self.all_sprites)
                     
             # Draw all sprites
+            for sprite in self.all_sprites:
+                if not hasattr(sprite, "image") or not isinstance(sprite.image, pygame.Surface):
+                    print(f"Invalid sprite: {sprite}, type: {type(sprite)}")
+
             self.all_sprites.draw(self.screen)
             
     def render_game_state(self):
