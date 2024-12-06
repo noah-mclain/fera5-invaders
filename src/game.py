@@ -139,7 +139,7 @@ class Game:
                             break
                     
                     # Check collision with player
-                    if egg.rect.colliderect(self.player.rect):
+                    if egg.rect.colliderect(self.player.rect) and egg.current_state == "whole":
                         if self.player.lose_life():
                             # Trigger the flickering on that heart
                             if len(self.hearts) > (self.player.lives):  
