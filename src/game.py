@@ -36,6 +36,7 @@ class Game:
             
             self.running = True
             self.paused = False  # Updated: Pause functionality
+# The above code snippet is defining a class in Python with an attribute `score` initialized to 0.
             self.score = 0
             self.all_chickens_dead = False  # Added: To track when all chickens are dead
 
@@ -47,13 +48,13 @@ class Game:
             self.player = Player(self.screen_width, self.screen_height)
             if not self.player:
                 raise RuntimeError("Failed to create player")
+            
+            self.all_sprites.add(self.player)
 
             self.hearts = [Heart((self.screen_width - (i + 1) * 60, 10)) for i in range(self.player.lives)]           
             for heart in self.hearts:
                 self.all_sprites.add(heart)
-                    
-            self.all_sprites.add(self.player)
-            
+   
             # Enemy grid setup
             self.setup_enemy_grid()
                     
@@ -123,7 +124,15 @@ class Game:
                         enemy.update(self.screen_width, self.screen_height)
                         self.score += 100
                     break
-
+                
+        for enemy in self.enemies:
+            if enemy.current_state == "food":
+                if enemy.rect.colliderect(self.player.rect):
+                    xp_gain = enemy.get_xp()  
+                    if xp_gain > 0:
+                        print(f"Gained {xp_gain} XP from food")
+                        self.player.add_xp(xp_gain)
+                    enemy._remove_sprite()
         # Flatten the list of eggs from all the enemies
         for enemy in self.enemies:
             for egg in enemy.eggs[:]:  # Use a copy of the list to avoid modifying it during iteration
@@ -187,10 +196,10 @@ class Game:
         """
         Apply a flicker effect to all newly respawned chickens.
         """
-        flicker_duration = 1500  # 1.5 seconds
-        flicker_interval = 100   # 100ms interval
+        flicker_duration = 1500  # Total flicker duration in milliseconds
+        flicker_interval = 100    # Interval between flickers
         start_time = pygame.time.get_ticks()
-
+        
         while pygame.time.get_ticks() - start_time < flicker_duration:
             for chicken in self.enemies:
                 chicken.set_alpha(0)  # Make chickens invisible
@@ -213,8 +222,7 @@ class Game:
 
     def toggle_pause(self):
         self.paused = not self.paused
-
-        
+  
     def run(self):
         print("Game loop started.")
         clock = pygame.time.Clock() 
@@ -254,7 +262,6 @@ class Game:
                 pause_text = font.render("Game paused (Press P to resume)", True, (255,255,255))
                 self.screen.blit(pause_text, (self.screen.width // 2 - 200, self.screen_height // 2))
                 pygame.display.flip()
-
         
     def update_game_state(self):       
         # Update sprites
@@ -289,20 +296,34 @@ class Game:
                 if not hasattr(sprite, "image") or not isinstance(sprite.image, pygame.Surface):
                     print(f"Invalid sprite: {sprite}, type: {type(sprite)}")
 
-            self.all_sprites.draw(self.screen)
+            try:
+                self.all_sprites.draw(self.screen)
+            except Exception as e:
+                print(f"Error drawing sprites: {e}")
             
     def render_game_state(self):
-        self.screen.fill((0,0,0))
-        self.player.draw(self.screen)
-        
-        self.all_sprites.draw(self.screen)
-        
-        for i in range(self.player.lives):
-            if i < len(self.hearts):
-                self.hearts[i].draw(self.screen)
-            
-        self.render_scores()
-        pygame.display.flip()
+        self.screen.fill((0, 0, 0))  # Clear the screen with black
+
+        # Check for invalid sprites before drawing
+        for sprite in self.all_sprites:
+            if not isinstance(sprite.image, pygame.Surface):
+                print(f"Invalid sprite: {sprite}, type: {type(sprite)}")
+
+        try:
+            if len(self.all_sprites) == 0:
+                print("No sprites to draw.")
+            else:
+                self.all_sprites.draw(self.screen)  # Draw all sprites
+
+            # Draw player lives
+            for heart in self.hearts:
+                heart.draw(self.screen)
+
+            self.render_scores()  # Render scores if applicable
+            pygame.display.flip()  # Update the display
+        except Exception as e:
+            print(f"Error drawing sprites: {e}")
+
         
     def display_victory_message(self):
         font = pygame.font.Font(None, 72)

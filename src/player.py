@@ -9,6 +9,7 @@ from environment.sprite import StaticSprite
 from environment.sprite_sheet import SpriteSheet
 from laser import Laser
 
+MAX_LIVES =3
 
 class Player(StaticSprite):
     def __init__(self, screen_width, screen_height):
@@ -16,7 +17,16 @@ class Player(StaticSprite):
         self.screen_height = screen_height
         self.laser_count = 1 
         self.laser_type = 0
-        self.laser_count = 1
+        self.speed = 0
+        self.max_speed = 8
+        self.alive = True
+        self.lasers = []
+        self.lives = 3
+        self.xp = 0
+        self.score = 0
+        self.flicker_timer = 0
+        self.powerup_effects={}
+
         # self.rect = self.image.get_rect(midbottom=(screen_width // 2, screen_height - 20))
         self.sprite_path_format = path.join("assets", "images", "ship{}.png")
         initial_image_path = self.sprite_path_format.format(self.laser_count)
@@ -37,14 +47,6 @@ class Player(StaticSprite):
         self.is_animating_powerup = False
         
         super().__init__(initial_image_path, position, size)
-
-        self.speed = 0
-        self.max_speed = 8
-        self.alive = True
-        self.lasers = []
-        self.lives = 3
-        self.flicker_timer = 0
-        self.powerup_effects={}
 
     def shoot(self):
         if len(self.lasers) < self.laser_count:
@@ -141,8 +143,6 @@ class Player(StaticSprite):
         self._trigger_powerup_animation()
         self._play_powerup_effect()
 
-
-
     def _update_sprite_for_laser_count(self):
         new_sprite_path = self.sprite_path_format.format(self.laser_count)
         if path.exists(new_sprite_path):
@@ -158,3 +158,20 @@ class Player(StaticSprite):
     def _play_powerup_effect(self):
         print("Power-up activated!")
         self.powerup_sound.play()
+        
+    def add_xp(self, amount):
+        """Add XP and handle life restoration or point conversion."""
+        print(f"XP gained: {amount}. Total XP before addition: {self.xp}")
+        
+        self.xp += amount
+        
+        while self.xp >= 1000:
+            if self.lives < MAX_LIVES:
+                print("Life restored!")
+                self.lives += 1
+                self.xp -= 1000
+            else:
+                points_gained = (self.xp // 1000) * 500
+                print(f"Converted {self.xp} XP to {points_gained} points")
+                self.score += points_gained
+                self.xp %= 1000  # Keep remainder of XP after conversion
