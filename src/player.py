@@ -122,6 +122,8 @@ class Player(StaticSprite):
 
     def apply_powerup(self, powerup):
         powerup.apply_to_player(self)
+        self._update_sprite_for_laser_count()
+        self.powerup_animation = None 
 
 
 

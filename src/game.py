@@ -53,7 +53,7 @@ class Game:
                 self.all_sprites.add(heart)
                     
             self.all_sprites.add(self.player)
-            
+            self.active_powerup = None
             # Enemy grid setup
             self.setup_enemy_grid()
                     
@@ -168,32 +168,32 @@ class Game:
     def handle_all_chickens_dead(self):
         self.score += 10000
         print("All chickens defeated! Respawning...")
-        
-        powerup = PowerUp(powerup_type="increment_laser", laser_increment=1)
-        self.all_sprites.add(powerup)  
-        powerup.rect.center = self.player.rect.center  # Position the power-up at the player's position
-        powerup.apply_powerup(powerup)
-        self.setup_enemy_grid()
+
+        # Create a PowerUp and store it
+        self.active_powerup = PowerUp(powerup_type="increment_laser", laser_increment=1)
+        self.active_powerup.rect.center = self.player.rect.center  # Position the power-up
+
+        # Flicker effect
         self.apply_chicken_flicker_effect()
+        self.setup_enemy_grid()
         self.all_chickens_dead = False
 
-    # Added: Flicker effect for chickens
+
+
     def apply_chicken_flicker_effect(self):
-        """
-        Apply a flicker effect to all newly respawned chickens.
-        """
         flicker_duration = 1500  # 1.5 seconds
-        flicker_interval = 100   # 100ms interval
         start_time = pygame.time.get_ticks()
 
-        while pygame.time.get_ticks() - start_time < flicker_duration:
+        def flicker():
+            elapsed_time = pygame.time.get_ticks() - start_time
+            visible = (elapsed_time // 100) % 2 == 0
             for chicken in self.enemies:
-                chicken.set_alpha(0)  # Make chickens invisible
-            pygame.time.delay(flicker_interval // 2)
-            for chicken in self.enemies:
-                chicken.set_alpha(255)  # Make chickens visible
-            pygame.time.delay(flicker_interval // 2)
+                chicken.set_alpha(255 if visible else 0)
 
+        while pygame.time.get_ticks() - start_time < flicker_duration:
+            flicker()
+            pygame.time.delay(50)
+        
     def game_over(self):
         ##YA MALAAAAKAKKK WRITE HERE THE LOGIC FOR THE EXIT MENUUU
         ##le7ad ma teegy ha7ot replacement code 
@@ -284,7 +284,17 @@ class Game:
                 if not hasattr(sprite, "image") or not isinstance(sprite.image, pygame.Surface):
                     print(f"Invalid sprite: {sprite}, type: {type(sprite)}")
 
-            self.all_sprites.draw(self.screen)
+            if self.active_powerup:
+                self.active_powerup.update()
+
+                # If animation is done, apply the power-up and remove it
+                if self.active_powerup.animation_done:
+                    self.player.apply_powerup(self.active_powerup)
+                    self.all_sprites.remove(self.active_powerup)  # Remove from sprite group
+                    self.active_powerup = None
+                    
+                    self.all_sprites.draw(self.screen)
+            
             
     def render_game_state(self):
         self.screen.fill((0,0,0))
@@ -296,6 +306,8 @@ class Game:
             if i < len(self.hearts):
                 self.hearts[i].draw(self.screen)
             
+        if self.active_powerup:
+            self.active_powerup.draw(self.screen)
         self.render_scores()
         pygame.display.flip()
         
