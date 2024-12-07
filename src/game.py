@@ -56,8 +56,9 @@ class Game:
             
             self.all_sprites.add(self.player)
 
-            self.hearts = [Heart((self.screen_width - (i + 1) * 60, 10)) for i in range(self.player.lives)]           
+            self.hearts = [Heart((self.screen_width - (i + 1) * 70, 20)) for i in range(self.player.lives)]           
             for heart in self.hearts:
+                heart.rect.size = (60, 60) 
                 self.all_sprites.add(heart)
                     
             self.all_sprites.add(self.player)
@@ -268,7 +269,8 @@ class Game:
             else:
                 font = pygame.font.Font(None, 48)
                 pause_text = font.render("Game paused (Press P to resume)", True, (255,255,255))
-                self.screen.blit(pause_text, (self.screen.width // 2 - 200, self.screen_height // 2))
+                self.screen.fill((0, 0, 0))
+                self.screen.blit(pause_text, (self.screen_width // 2 - 200, self.screen_height // 2))
                 pygame.display.flip()
         
     def update_game_state(self):       
