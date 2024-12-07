@@ -127,7 +127,15 @@ class Game:
                         enemy.update(self.screen_width, self.screen_height)
                         self.score += 100
                     break
-
+                
+        for enemy in self.enemies:
+            if enemy.current_state == "food":
+                if enemy.rect.colliderect(self.player.rect):
+                    xp_gain = enemy.get_xp()  
+                    if xp_gain > 0:
+                        print(f"Gained {xp_gain} XP from food")
+                        self.player.add_xp(xp_gain)
+                    enemy._remove_sprite()
         # Flatten the list of eggs from all the enemies
         for enemy in self.enemies:
             for egg in enemy.eggs[:]:  # Use a copy of the list to avoid modifying it during iteration
@@ -167,6 +175,12 @@ class Game:
                     enemy.eggs.remove(egg)  # Remove from enemy's eggs list
                     self.all_sprites.remove(egg)  # Remove from all sprites group
 
+
+        # Added: Check if all chickens are dead
+        if Chicken.get_chicken_count() == 0 and not self.all_chickens_dead:
+            self.all_chickens_dead = True
+            self.handle_all_chickens_dead()
+
     # Added: Handle actions when all chickens are dead
     def handle_all_chickens_dead(self):
         self.score += 10000
@@ -180,8 +194,6 @@ class Game:
         self.apply_chicken_flicker_effect()
         self.setup_enemy_grid()
         self.all_chickens_dead = False
-
-
 
     def apply_chicken_flicker_effect(self):
         flicker_duration = 1500  # 1.5 seconds
@@ -239,8 +251,7 @@ class Game:
             # Update enemies
             if not self.enemies:
                 self.display_victory_message()
-                self.running = False
-                
+                self.running = False              
             
             if not self.paused:
                 self.check_collisions()
@@ -295,8 +306,7 @@ class Game:
                     self.active_powerup = None
                     
                     self.all_sprites.draw(self.screen)
-            
-            
+                 
     def render_game_state(self):
         self.screen.fill((0,0,0))
         self.player.draw(self.screen)

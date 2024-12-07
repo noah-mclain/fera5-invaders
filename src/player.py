@@ -18,6 +18,14 @@ class Player(StaticSprite):
         self.screen_height = screen_height
         self.laser_count = 1 
         self.laser_type = 0
+        
+        self.sprite_path_format = path.join("assets", "images", "ship{}.png")
+        initial_image_path = self.sprite_path_format.format(self.laser_count)
+        size = (50, 50)
+        position = (screen_width // 2, screen_height - 200)
+
+        self.sprite = pygame.image.load(initial_image_path).convert_alpha()
+        
         self.speed = 0
         self.max_speed = 8
         self.alive = True
@@ -26,25 +34,7 @@ class Player(StaticSprite):
         self.xp = 0
         self.score = 0
         self.flicker_timer = 0
-        self.powerup_effects={}
-
-        # self.rect = self.image.get_rect(midbottom=(screen_width // 2, screen_height - 20))
-        self.sprite_path_format = path.join("assets", "images", "ship{}.png")
-        initial_image_path = self.sprite_path_format.format(self.laser_count)
-        size = (50, 50)
-        position = (screen_width // 2, screen_height - 200)
-
-        self.sprite = pygame.image.load(initial_image_path).convert_alpha()
-        self.powerup_sound = pygame.mixer.Sound("assets/sounds/take-off-36682.mp3")
-
-        powerup_sprite_sheet_path = path.join("assets", "images","powerups", "powerup.png")
-        sprite_sheet = SpriteSheet(pygame.image.load(powerup_sprite_sheet_path).convert_alpha())
-        print("SPRITE FOUND")
-        
-        self.powerup_animation = AnimationSequence(
-            [sprite_sheet.get_image_at_pos(i * 64, 0, 64, 64, scale=1.5) for i in range(30)],
-            animation_speed=0.1
-        )
+        self.powerup_animation = None
         self.is_animating_powerup = False
         
         super().__init__(initial_image_path, position, size)
@@ -87,13 +77,9 @@ class Player(StaticSprite):
         for laser in self.lasers:
             laser.draw(screen)
             
-        if self.is_animating_powerup:
-            self.powerup_animation.update(pygame.time.get_ticks())
-            self.powerup_animation.draw(screen, self.rect.center)
-            if self.powerup_animation.animation_finished:
-                self.is_animating_powerup = False 
-        else:
-            screen.blit(self.image, self.rect) 
+        if self.powerup_animation and not self.powerup_animation.animation_done:
+            self.powerup_animation.update()
+            self.powerup_animation.draw(screen)
         
         for laser in self.lasers:
             laser.draw(screen)
@@ -147,8 +133,7 @@ class Player(StaticSprite):
             self.sprite = pygame.image.load(new_sprite_path).convert_alpha()
         else:
             print(f"Warning: Sprite for laser count {self.laser_count} not found.")
-
-        
+       
     def add_xp(self, amount):
         """Add XP and handle life restoration or point conversion."""
         print(f"XP gained: {amount}. Total XP before addition: {self.xp}")
