@@ -135,16 +135,16 @@ class AnimatedSprite(pygame.sprite.Sprite):
                     frame = self.sprite_sheet.get_image_at_pos(
                         x=frame_data["x"],
                         y=frame_data["y"],
-                        width=width,
-                        height=height,
-                        scale=state_data["scale"],
+                        width=state_data["width"], height=state_data["height"],
+                        scale=state_data.get("scale", 1),
                         color=(0, 0, 0)
                     )
                     
                     if frame is not None:
                         self.frames[state].append(frame)
                         print(f"Loaded {state} frame at position ({frame_data['x']}, {frame_data['y']}) with size {width}x{height}")
-                        
+                    else:
+                        print(f"Warning: Failed to load frame for state '{state}' at x={frame_data['x']}, y={frame_data['y']}") 
                 except Exception as e:
                     print(f"Error loading {state} frame: {str(e)}")
             
