@@ -37,7 +37,7 @@ class Game:
             self.running = True
             self.paused = False  # Updated: Pause functionality
 # The above code snippet is defining a class in Python with an attribute `score` initialized to 0.
-            self.score = 0
+            # self.score = 0
             self.all_chickens_dead = False  # Added: To track when all chickens are dead
             self.current_round = 1
             self.round_transitioning = False
@@ -51,6 +51,7 @@ class Game:
             self.lasers = pygame.sprite.Group()
            
             self.player = Player(self.screen_width, self.screen_height)
+            self.player.game_instance = self
             if not self.player:
                 raise RuntimeError("Failed to create player")
             
@@ -131,7 +132,7 @@ class Game:
                         laser.engage()
                         enemy.killChicken()
                         enemy.update(self.screen_width, self.screen_height)
-                        self.score += 100
+                        self.player.score += 100
                     break
                 
         for enemy in self.enemies:
@@ -142,6 +143,7 @@ class Game:
                         print(f"Gained {xp_gain} XP from food")
                         self.player.add_xp(xp_gain)
                     enemy._remove_sprite()
+                    
         # Flatten the list of eggs from all the enemies
         for enemy in self.enemies:
             for egg in enemy.eggs[:]:  # Use a copy of the list to avoid modifying it during iteration
@@ -152,6 +154,7 @@ class Game:
                         if laser.rect.colliderect(egg.rect):
                             laser.engage()
                             egg.breakEgg()  # Trigger the broken animation
+                            self.player.score += 50
                             if laser in self.all_sprites:
                                 self.all_sprites.remove(laser)
                             break
@@ -193,7 +196,7 @@ class Game:
         self.frozen = True 
         self.frozen_start_time = pygame.time.get_ticks()
         self.current_round +=1
-        self.score += 10000
+        self.player.score += 10000
         print(f"All chickens defeated! Starting round {self.current_round}...")
 
         # Create a PowerUp and store it
@@ -336,6 +339,7 @@ class Game:
         if self.active_powerup:
             self.active_powerup.draw(self.screen)
         self.render_scores()
+        self.render_xp()
         self.render_round_number()
         pygame.display.flip()
         
@@ -360,7 +364,7 @@ class Game:
         digit_width = score_sheet.get_width() // 10
         digit_height = score_sheet.get_height()
         digits = [score_sheet.subsurface(pygame.Rect(i * digit_width, 0, digit_width, digit_height)) for i in range(10)]
-        score_str = str(self.score)
+        score_str = str(self.player.score)
         x_offset = 10
         y_offset = 10
 
@@ -368,3 +372,27 @@ class Game:
             digit_surface = digits[int(digit)]
             self.screen.blit(digit_surface, (x_offset, y_offset))
             x_offset += digit_width + 2
+
+    def render_xp(self):
+        xp_image_path = path.join("assets", "images", "scores1.png")  
+        xp_sheet = pygame.image.load(xp_image_path).convert_alpha()
+
+        digit_width = xp_sheet.get_width() // 10
+        digit_height = xp_sheet.get_height()
+
+        digits = [xp_sheet.subsurface(pygame.Rect(i * digit_width, 0, digit_width, digit_height)) for i in range(10)]
+
+        xp_str = str(self.player.xp)
+        x_offset = 30
+        y_offset = 30 
+
+        font = pygame.font.Font(None, 36) 
+        label_surface = font.render("XP: ", True, (255, 255, 255))  
+        self.screen.blit(label_surface, (x_offset, y_offset))
+
+        x_offset += label_surface.get_width() 
+
+        for digit in xp_str:
+            digit_surface = digits[int(digit)] 
+            self.screen.blit(digit_surface, (x_offset, y_offset)) 
+            x_offset += digit_width + 2  

@@ -20,8 +20,15 @@ class Heart(AnimatedSprite):
             self.flicker_count = 4
             self.play_animation("empty", loop=False)
             
-
+    def play_reverse_animation(self):
+        # Play the lose life animation in reverse to restore the life
+        print("Restoring life")
+        self.animation_done = False
+        self.play_animation("full", loop=False)
+        
     def update(self):
+        super().update()  # Call parent update to handle animation frames
+
         # Update the heart's state.
         if self.flickering:
             # Check if we need to switch animations based on flicker count
@@ -44,7 +51,6 @@ class Heart(AnimatedSprite):
                 self.flickering = False
                 self.play_animation("empty", loop=False)
 
-        super().update()  # Call parent update to handle animation frames
 
     def draw(self, screen):
         # Draw the current image of the heart on the given surface.

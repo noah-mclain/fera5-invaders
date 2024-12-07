@@ -42,10 +42,21 @@ class AnimatedSprite(pygame.sprite.Sprite):
         sprite_data = {
             "chicken": {
                 "alive": {
-                    "width": 40,
+                    "width": 45,
                     "height": 35,
                     "frames": [
-                        {"name": f"chicken_frame_{i}", "x": i * 40, "y": 0} for i in range(10)  # Generates frames with x positions
+                        # {"name": "alive_frame_1", "x": 0, "y": 0, "width": 45, "height": 35},
+                        # {"name": "alive_frame_2", "x": 45, "y": 0, "width": 45, "height": 35},
+                        # {"name": "alive_frame_3", "x": 90, "y": 0, "width": 45, "height": 35},
+                        # {"name": "alive_frame_4", "x": 135, "y": 0, "width": 45, "height": 35},
+                        # {"name": "alive_frame_5", "x": 180, "y": 0, "width": 45, "height": 35},
+                        # {"name": "alive_frame_6", "x": 225, "y": 0, "width": 45, "height": 35},
+                        # {"name": "alive_frame_7", "x": 270, "y": 0, "width": 45, "height": 35},
+                        # {"name": "alive_frame_8", "x": 315, "y": 0, "width": 45, "height": 35},
+                        # {"name": "alive_frame_9", "x": 360, "y": 0, "width": 45, "height": 35},
+                        # {"name": "alive_frame_9", "x": 360, "y": 0, "width": 45, "height": 35},
+                        # {"name": "alive_frame_10", "x": 405, "y": 0, "width": 45, "height": 35},
+                        {"name": f"chicken_frame_{i}", "x": i * 45, "y": 0} for i in range(10)  # Generates frames with x positions
                     ],
                     "scale": 1.5
                 },
@@ -53,7 +64,7 @@ class AnimatedSprite(pygame.sprite.Sprite):
                     "width": 45,
                     "height": 35,
                     "frames": [
-                        {"name": "dead_frame", "x": 360, "y": 0, "width": 45, "height": 35}
+                        {"name": "dead_frame", "x": 450, "y": 0, "width": 45, "height": 35}
                     ],  # Single frame for death
                     "scale": 1
                 },
@@ -61,9 +72,9 @@ class AnimatedSprite(pygame.sprite.Sprite):
                     "width": 45,
                     "height": 35,
                     "frames": [
-                        {"name": "chicken_leg", "x": 405, "y": 0, "width": 45, "height": 35},   # First food frame
-                        {"name": "double_chicken_leg", "x": 450, "y": 0, "width": 45, "height": 35},   # Second food frame
-                        {"name": "roast", "x": 495, "y": 0, "width": 45, "height": 35}    # Third food frame
+                        {"name": "chicken_leg", "x": 495, "y": 0, "width": 45, "height": 35},   # First food frame
+                        {"name": "double_chicken_leg", "x": 540, "y": 0, "width": 45, "height": 35},   # Second food frame
+                        {"name": "roast", "x": 585, "y": 0, "width": 45, "height": 35}    # Third food frame
                     ],
                     "scale": 1,
                 }
@@ -80,7 +91,7 @@ class AnimatedSprite(pygame.sprite.Sprite):
                     "width": 28,
                     "height": 24,
                     "frames": [
-                        {"name": "broken_frame_1", "x": 28, "y": 0, "width": 28, "height": 24},
+                        {"name": "alive_frame_1", "x": 28, "y": 0, "width": 28, "height": 24},
                         {"name": "broken_frame_2", "x": 56, "y": 0, "width": 28, "height": 24},
                         {"name": "broken_frame_3", "x": 81, "y": 0, "width": 28, "height": 24},
                         {"name": "broken_frame_4", "x": 109, "y": 0, "width": 28, "height": 24},
@@ -122,6 +133,12 @@ class AnimatedSprite(pygame.sprite.Sprite):
         for state, state_data in data.items():
             self.frames[state] = []
             for frame_data in state_data.get("frames", []):
+                if not isinstance(frame_data, dict):
+                    print(f"Warning: Expected frame data to be a dictionary, got: {frame_data}")
+                    continue  # Skip invalid frame data
+                
+                # Debugging output
+                print(f"Processing {state} frame data: {frame_data}")
                 try:
                     # Ensure frame_data is a dictionary
                     if isinstance(frame_data, int):
