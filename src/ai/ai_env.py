@@ -14,22 +14,24 @@ class ai_env:
     # returns all possible actions in a given state        
     def available_actions(self):
         available_actions = ["shoot", "stop"]
-        if self.player.rect.x > self.game.screen_width:
-            available_actions.append("left")
-        if self.player.rect.x < 0:
+        if self.player.rect.x < self.game.screen_width:
+            print("hi!")
             available_actions.append("right")
+        if self.player.rect.x > 0:
+            print("yo!")
+            available_actions.append("left")
         return available_actions
     
     # performs the current action chosen by the AI 
     def step(self,action): 
         if action=="right":
-            self.player.move(-3)
+            self.player.move(-3.7)
         elif action=="left":
-            self.player.move(3)
+            self.player.move(3.7)
         elif action=="shoot":
             self.player.shoot()
         
-        self.game.update()
+        #self.game.update()
         
         reward=self.calculate_reward()
          
@@ -77,12 +79,14 @@ class ai_env:
     
     # checks if the game is over
     def game_over(self):
-        if self.environment.running == False:
+        if self.game.running == False:
             return False
         return True
     
     # to calculate the reward/penalty for each action the AI takes
+
     def calculate_reward(self):
+        return 0
         reward=0
         
         if self.player.hit_enemy :
@@ -93,3 +97,4 @@ class ai_env:
             reward-=10
         
         return reward
+
