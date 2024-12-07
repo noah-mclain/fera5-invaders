@@ -38,7 +38,9 @@ class AI:
 
         if probability <= self.epsilon:
             # implement exploration logic here
-            action = choice[self.environment.available_actions()]
+            print(self.environment.available_actions())
+            print(self.epsilon)
+            action = choice(self.environment.available_actions())
         
         else:
             # implement exploitation logic here
@@ -78,6 +80,7 @@ class AI:
         if len(self.replay_memory) > self.memory_capacity:
             self.replay_memory.pop(0)
         self.replay_memory.append((state, action, reward, next_state, done))
+        print(self.replay_memory)
         
     """decreases the Epsilon's value gradually"""
     def update_epsilon(self):
