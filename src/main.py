@@ -2,6 +2,7 @@
 import pygame
 import sys
 from game import Game
+from gameAI import GameAI
 
 def check_dependencies():
     """Check if all required assets and modules are available"""
@@ -39,7 +40,7 @@ def main():
         pygame.display.init()
         
         print("Creating game...")
-        game = Game()
+        game = GameAI()
         print("Game created successfully")
         
         print("Running game...")
