@@ -39,8 +39,13 @@ class Game:
 # The above code snippet is defining a class in Python with an attribute `score` initialized to 0.
             self.score = 0
             self.all_chickens_dead = False  # Added: To track when all chickens are dead
-
-            # Create sprite groups
+            self.current_round = 1
+            self.round_transitioning = False
+            self.round_transition_start_time =0 
+            self.frozen = False  # New: Game is frozen during power-up
+            self.frozen_start_time = 0
+            self.freeze_duration = 3000
+            
             self.all_sprites = pygame.sprite.Group()
             self.enemies = pygame.sprite.Group()
             self.lasers = pygame.sprite.Group()
@@ -183,16 +188,19 @@ class Game:
 
     # Added: Handle actions when all chickens are dead
     def handle_all_chickens_dead(self):
+        self.round_transitioning = True
+        self.frozen = True 
+        self.frozen_start_time = pygame.time.get_ticks()
+        self.current_round +=1
         self.score += 10000
-        print("All chickens defeated! Respawning...")
+        print(f"All chickens defeated! Starting round {self.current_round}...")
 
         # Create a PowerUp and store it
         self.active_powerup = PowerUp(powerup_type="increment_laser", laser_increment=1)
         self.active_powerup.rect.center = self.player.rect.center  # Position the power-up
-
-        # Flicker effect
-        self.apply_chicken_flicker_effect()
         self.setup_enemy_grid()
+        self.apply_chicken_flicker_effect()
+        self.player.apply_powerup(self.active_powerup)
         self.all_chickens_dead = False
 
     def apply_chicken_flicker_effect(self):
@@ -264,48 +272,54 @@ class Game:
                 pygame.display.flip()
         
     def update_game_state(self):       
-        # Update sprites
-            self.player.update(self.screen_width, self.screen_height)
-            
-            # Update player lives
-            for heart in self.hearts:
-                heart.update()
-            
-            # Update and add new lasers to sprite groups
-            for laser in self.player.lasers:
-                if laser not in self.all_sprites:
-                    self.all_sprites.add(laser)
-                    self.lasers.add(laser)
-                laser.update(self.screen_width, self.screen_height)
-            
-            # Remove dead lasers from sprite groups
-            for laser in self.lasers.copy():
-                if not laser.is_fired:
-                    self.all_sprites.remove(laser)
-                    self.lasers.remove(laser)
+        self.player.update(self.screen_width, self.screen_height)
+        for heart in self.hearts:
+            heart.update()
+        
+        # Update and add new lasers to sprite groups
+        for laser in self.player.lasers:
+            if laser not in self.all_sprites:
+                self.all_sprites.add(laser)
+                self.lasers.add(laser)
+            laser.update(self.screen_width, self.screen_height)
+        
+        # Remove dead lasers from sprite groups
+        for laser in self.lasers.copy():
+            if not laser.is_fired:
+                self.all_sprites.remove(laser)
+                self.lasers.remove(laser)
 
-            for enemy in self.enemies:
-                enemy.update(self.screen_width, self.screen_height)
-                if enemy.current_state == "alive":
-                     # Laying those eggs
-                    if random.random() < 0.001:
-                        enemy.lay_eggs(self.all_sprites)
+        for enemy in self.enemies:
+            enemy.update(self.screen_width, self.screen_height)
+            if enemy.current_state == "alive":
+                if random.random() < 0.001:
+                    enemy.lay_eggs(self.all_sprites)
+                
+        # Draw all sprites
+        for sprite in self.all_sprites:
+            if not hasattr(sprite, "image") or not isinstance(sprite.image, pygame.Surface):
+                print(f"Invalid sprite: {sprite}, type: {type(sprite)}")
+
+        if self.frozen:
+                current_time = pygame.time.get_ticks()
+
+                # Wait for power-up animation and sound to complete
+                if self.active_powerup:
+                    self.active_powerup.update()
+                    if self.active_powerup.animation_done:
+                        self.active_powerup.apply_to_player(self.player)
+                        self.all_sprites.remove(self.active_powerup)
+                        self.active_powerup = None
+
+                # Unfreeze the game after the duration
+                if current_time - self.frozen_start_time > self.freeze_duration:
+                    self.frozen = False
+                    self.round_transitioning = False
+                    self.setup_enemy_grid()
+                return  # Skip other updates while frozenive_powerup)  # Remove from sprite group
+                
                     
-            # Draw all sprites
-            for sprite in self.all_sprites:
-                if not hasattr(sprite, "image") or not isinstance(sprite.image, pygame.Surface):
-                    print(f"Invalid sprite: {sprite}, type: {type(sprite)}")
-
-            if self.active_powerup:
-                self.active_powerup.update()
-
-                # If animation is done, apply the power-up and remove it
-                if self.active_powerup.animation_done:
-                    self.player.apply_powerup(self.active_powerup)
-                    self.all_sprites.remove(self.active_powerup)  # Remove from sprite group
-                    self.active_powerup = None
-                    
-                    self.all_sprites.draw(self.screen)
+        self.all_sprites.draw(self.screen)
                  
     def render_game_state(self):
         self.screen.fill((0,0,0))
@@ -320,7 +334,14 @@ class Game:
         if self.active_powerup:
             self.active_powerup.draw(self.screen)
         self.render_scores()
+        self.render_round_number()
         pygame.display.flip()
+        
+
+    def render_round_number(self):
+        font = pygame.font.Font(None, 48)
+        round_text = font.render(f"Round: {self.current_round}", True, (255, 255, 255))
+        self.screen.blit(round_text, (10, 50))  # Position below the score
         
     def display_victory_message(self):
         font = pygame.font.Font(None, 72)

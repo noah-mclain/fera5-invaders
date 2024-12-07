@@ -41,7 +41,7 @@ class Player(StaticSprite):
 
     def shoot(self):
         if len(self.lasers) < self.laser_count:
-            total_spread = 25  # Total spread angle in degrees (adjust as desired)
+            total_spread = 5  # Total spread angle in degrees (adjust as desired)
             if self.laser_count == 1:
                 angles = [0]  
             else:
