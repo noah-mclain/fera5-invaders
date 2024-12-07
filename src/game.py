@@ -113,6 +113,7 @@ class Game:
             print(f"Error setting up enemy grid: {str(e)}")
             raise   
     
+       
     def check_collisions(self):
         # Check laser collisions with enemies 
         for enemy in self.enemies.sprites():
@@ -172,23 +173,17 @@ class Game:
                     enemy.eggs.remove(egg)  # Remove from enemy's eggs list
                     self.all_sprites.remove(egg)  # Remove from all sprites group
 
-
-        # Added: Check if all chickens are dead
-        if Chicken.get_chicken_count() == 0 and not self.all_chickens_dead:
-            self.all_chickens_dead = True
-            self.handle_all_chickens_dead()
-
     # Added: Handle actions when all chickens are dead
     def handle_all_chickens_dead(self):
         self.score += 10000
         print("All chickens defeated! Respawning...")
-        self.player._play_powerup_effect()
+        
+        powerup = PowerUp(powerup_type="increment_laser", laser_increment=1)
+        self.all_sprites.add(powerup)  
+        powerup.rect.center = self.player.rect.center  # Position the power-up at the player's position
+        powerup.apply_powerup(powerup)
         self.setup_enemy_grid()
         self.apply_chicken_flicker_effect()
-        powerup = PowerUp("increment_laser", laser_increment=1)
-        self.player.apply_powerup(powerup)
-
-        # Reset the flag for chicken respawn
         self.all_chickens_dead = False
 
     # Added: Flicker effect for chickens

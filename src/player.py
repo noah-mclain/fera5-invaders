@@ -8,6 +8,7 @@ from environment.animation_sequence import AnimationSequence
 from environment.sprite import StaticSprite
 from environment.sprite_sheet import SpriteSheet
 from laser import Laser
+from powerup import PowerUp 
 
 MAX_LIVES =3
 
@@ -50,14 +51,14 @@ class Player(StaticSprite):
 
     def shoot(self):
         if len(self.lasers) < self.laser_count:
-            total_spread = 60  # Total spread angle in degrees (adjust as desired)
+            total_spread = 25  # Total spread angle in degrees (adjust as desired)
             if self.laser_count == 1:
-                angles = [0]  # Single laser shoots straight up
+                angles = [0]  
             else:
                 step = total_spread / (self.laser_count - 1)
                 angles = [-total_spread / 2 + i * step for i in range(self.laser_count)]
             
-            laser_spacing = 15  # Distance between lasers
+            laser_spacing = 15  
             total_width = laser_spacing * (self.laser_count - 1)
             start_x = self.rect.centerx - (total_width // 2)
 
@@ -99,25 +100,26 @@ class Player(StaticSprite):
 
     def update(self, screen_width=None, screen_height=None):
         self.rect.x += self.speed
+        self.rect.clamp_ip(pygame.Rect(0, 0, screen_width, screen_height))
+
         if self.rect.x < 0:
             self.rect.x = 0
         elif self.rect.x > self.screen_width - self.rect.width:
             self.rect.x = self.screen_width - self.rect.width
         keys = pygame.key.get_pressed()
-        # if keys[pygame.K_LEFT]:
-        #     self.rect.x -= self.speed
-        # if keys[pygame.K_RIGHT]:
-        #     self.rect.x += self.speed
-
-        self.rect.clamp_ip(pygame.Rect(0, 0, 1920, 1080))
+       
         for laser in self.lasers[:]:
             laser.update()
             if laser.rect.bottom < 0:
                 self.lasers.remove(laser)
 
         self.fired_lasers()
+
         for laser in self.lasers:
             laser.update()
+
+        if self.powerup_animation and not self.powerup_animation.animation_done:
+            self.powerup_animation.update()
 
     def die(self):
         death_image_path = path.join("assets", "images", "shipDie.png")
@@ -135,13 +137,7 @@ class Player(StaticSprite):
         return self.lives > 0
 
     def apply_powerup(self, powerup):
-        #powerup.apply(self)
-        if powerup.type == "increment_laser":
-            self.laser_count += powerup.laser_increment
-        elif powerup.type == "change_laser":
-            self.laser_type = powerup.laser_type
-        self._trigger_powerup_animation()
-        self._play_powerup_effect()
+        powerup.apply_to_player(self)
 
     def _update_sprite_for_laser_count(self):
         new_sprite_path = self.sprite_path_format.format(self.laser_count)
@@ -150,14 +146,6 @@ class Player(StaticSprite):
         else:
             print(f"Warning: Sprite for laser count {self.laser_count} not found.")
 
-    def _trigger_powerup_animation(self):
-        print("Triggering powerup animation!")
-        self.is_animating_powerup = True
-        self.powerup_animation.play(loop = False)
-
-    def _play_powerup_effect(self):
-        print("Power-up activated!")
-        self.powerup_sound.play()
         
     def add_xp(self, amount):
         """Add XP and handle life restoration or point conversion."""

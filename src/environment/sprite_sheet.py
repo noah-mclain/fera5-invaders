@@ -9,6 +9,7 @@ class SpriteSheet():
     def get_image_at_pos(self, x, y, width, height, scale=1, color=None):
         try:
             sheet_width, sheet_height = self.sheet.get_size()
+            
             print(f"Attempting to extract frame:")
             print(f"- Sheet size: {sheet_width}x{sheet_height}")
             print(f"- Extraction area: x={x}, y={y}, width={width}, height={height}")
