@@ -9,8 +9,7 @@ class Heart(AnimatedSprite):
         
         self.current_state = "full"
         self.flickering = False
-        self.flicker_count = 0
-        
+        self.flicker_count = 0 
         self.play_animation("full", loop=False)
         
     def lose_life(self):
@@ -19,7 +18,7 @@ class Heart(AnimatedSprite):
             print("Heart is flickering")
             self.flickering = True
             self.flicker_count = 4
-            self.play_animation("full", loop=False)
+            self.play_animation("empty", loop=False)
             
 
     def update(self):
@@ -27,10 +26,10 @@ class Heart(AnimatedSprite):
         if self.flickering:
             # Check if we need to switch animations based on flicker count
             if self.flicker_count > 0:
-                if self.current_animation == "full":
-                    self.play_animation("empty", loop=False)  # Switch to empty
+                if self.current_animation == "empty":
+                    self.play_animation("full", loop=False)  # Switch to empty
                 else:
-                    self.play_animation("full", loop=False)  # Switch back to full
+                    self.play_animation("empty", loop=False)  # Switch back to full
                 
                 # Decrease flicker count after switching states
                 self.flicker_count -= 1
@@ -43,6 +42,7 @@ class Heart(AnimatedSprite):
                 self.current_state = "empty"
                 print("Heart is now empty")
                 self.flickering = False
+                self.play_animation("empty", loop=False)
 
         super().update()  # Call parent update to handle animation frames
 

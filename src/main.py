@@ -1,21 +1,18 @@
-# Main game loop and initialization
 import pygame
 import sys
 from game import Game
-from gameAI import GameAI
+from menu import GameMenu
 
 def check_dependencies():
-    """Check if all required assets and modules are available"""
     required_files = [
         "assets/images/ship.png",
         "assets/images/bullet/a1.png",
         "assets/images/shipDie.png",
         "assets/images/Enemy/chickenRedSpriteSheet.png",
-        "assets/images/Enemy/eggSpriteSheet.png",
+        "assets/images/Enemy/eggSpriteSheet.png",  
         "assets/images/background/livesSpriteSheet.png"
     ]
 
-    
     for file in required_files:
         try:
             with open(file, 'rb') as f:
@@ -25,40 +22,48 @@ def check_dependencies():
             return False
     return True
 
-def main():
-    game = None   
-    try:
-        print("Checking dependencies...")
-        if not check_dependencies():
-            print("Missing required files. Please ensure all assets are in place.")
-            return
+def run_game():
+    print("Initializing pygame...")
+    pygame.init()
 
-        print("Initializing pygame...")
-        pygame.init()
-        
-        print("Setting up display...")
-        pygame.display.init()
-        
-        print("Creating game...")
-        game = GameAI()
+    print("Setting up display...")
+    pygame.display.init()
+
+    print("Creating game menu...")
+    menu = GameMenu()
+
+    print("Running menu loop...")
+    choice = menu.menu_loop()  # Get user selection from menu
+
+    if choice == "start_game":
+        print("Starting the game...")
+        game = Game()
         print("Game created successfully")
-        
-        print("Running game...")
-        if game:
-            game.run()
-        
-    except pygame.error as e:
-        print(f"Pygame error occurred: {str(e)}")
-    except Exception as e:
-        print(f"An unexpected error occurred: {str(e)}")
-        import traceback
-        traceback.print_exc()
-    finally:
-        if game:
-            game.running = False
+        game.run()
+
+    elif choice == "play_as_ai":
+        print("You are playing as AI...")
+        # Implement AI logic here
+
+    elif choice == "train_ai":
+        print("Training AI...")
+        # Implement AI training here
+
+    elif choice == "options":
+        print("Opening options...")
+        # Implement options here
+
+    elif choice == "quit":
+        print("Exiting the game...")
         pygame.quit()
         sys.exit()
 
+def main():
+    if not check_dependencies():
+        print("Missing required files. Please ensure all assets are in place.")
+        return
+
+    run_game()
 
 if __name__ == "__main__":
     main()

@@ -19,6 +19,7 @@ class Chicken(AnimatedSprite):
         
         # Start with alive animation
         self.play_animation("alive", loop=True)
+        self.food_frames = ["chicken_leg", "double_chicken_leg", "roast"]
         
         # Track states
         self.is_food = False
@@ -97,11 +98,24 @@ class Chicken(AnimatedSprite):
             self.current_state = "food"
             self.stop_animation()
             if "food" in self.animations:
-                self.animations["food"].frame_index = 0  # Reset frame index
-                self.animations["food"].last_update = pygame.time.get_ticks()  # Reset timer
+                # self.animations["food"].frame_index = 0  # Reset frame index
+                # self.animations["food"].last_update = pygame.time.get_ticks()  # Reset timer
                 self.play_animation("food", loop=False)
                 self.is_food = True
-
+                
+    def get_xp(self):
+        """Return the XP value based on the current state"""
+        if self.current_state == "food":
+            # Check which food frame is currently displayed
+            current_frame_name = super().current_animation_frame_name()  # Assume this method returns the current frame's name
+            if current_frame_name == "chicken_leg":
+                return 25
+            elif current_frame_name == "double_chicken_leg":
+                return 50
+            elif current_frame_name == "roast":
+                return 100
+        return 0  # No XP if not in a food state
+    
     def _remove_sprite(self):
         """Remove the sprite after all animations are complete"""
         self.kill()  # This removes the sprite from all sprite groups
