@@ -7,7 +7,7 @@ import gymnasium as gym
 import numpy as np
 from random import choice
 from random import sample
-
+import keras
 
 class AI:
     """
@@ -59,8 +59,15 @@ class AI:
             return
         batch = sample(self.replay_memory, self.batch_size)
         states, actions, rewards, next_states, dones = zip(*batch)
-        states = np.array(states)
-        next_states = np.array(next_states)
+        for i, state in enumerate(states):
+            print(len(state))
+        print("5alasna!")
+        padded_states = keras.pad_sequences(states, padding='post')  # Pads with zeros at the end
+        states_array = np.array(padded_states)
+        padded_new_states = keras.pad_sequences(padded_new_states, padding='post')
+        padded_new_states=np.array(padded_new_states)
+        states = np.array(states_array).flatten()
+        next_states = np.array(padded_new_states).flatten()
         q_values = np.array(rewards)
         next_q_values = self.model.predict(next_states)
 

@@ -84,7 +84,7 @@ class Chicken(AnimatedSprite):
             self.isChickenAlive = False
             self.current_state = "dead"
             self.stop_animation()
-            if 'dead' in self.animations:
+            if "dead" in self.animations:
                 self.play_animation("dead", loop=False)
             print("playing dead animation")
             # self.animations["dead"].callback = self._switch_to_food

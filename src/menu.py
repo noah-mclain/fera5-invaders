@@ -1,6 +1,7 @@
 import pygame
 import os
 from game import Game
+from gameAI import GameAI
 
 class GameMenu:
     def __init__(self):
@@ -75,6 +76,9 @@ class GameMenu:
                 break
             elif choice == "play_as_ai":
                 print("You are playing as AI...")
+                game = GameAI()
+                game.run()
+                
                 break
             elif choice == "train_ai":
                 print("Training AI...")
