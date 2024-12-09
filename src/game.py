@@ -50,6 +50,9 @@ class Game:
             self.enemies = pygame.sprite.Group()
             self.lasers = pygame.sprite.Group()
            
+            self.direction = 1
+            self.movement_speed = 3
+            
             self.player = Player(self.screen_width, self.screen_height)
             self.player.game_instance = self
             if not self.player:
@@ -57,10 +60,24 @@ class Game:
             
             self.all_sprites.add(self.player)
 
-            self.hearts = [Heart((self.screen_width - (i + 1) * 70, 20)) for i in range(self.player.lives)]           
-            for heart in self.hearts:
-                heart.rect.size = (60, 60) 
-                self.all_sprites.add(heart)
+            self.hearts = []
+            for i in range(self.player.lives):
+                print(f"Initializing heart {i + 1} at position: ({self.screen_width - (i + 1) * 70}, 20)")
+                try:
+                    heart = Heart((self.screen_width - (i + 1) * 70, 20))
+                    heart.rect.size = (60, 60)
+                    self.hearts.append(heart)
+                    self.all_sprites.add(heart)
+                    print(f"Heart {i + 1} initialized successfully.")
+                except KeyError as e:
+                    print(f"KeyError while initializing heart {i + 1}: {str(e)}")
+                except Exception as e:
+                    print(f"Error while initializing heart {i + 1}: {str(e)}")
+
+            # self.hearts = [Heart((self.screen_width - (i + 1) * 70, 20)) for i in range(self.player.lives)]           
+            # for heart in self.hearts:
+            #     heart.rect.size = (60, 60) 
+            #     self.all_sprites.add(heart)
                     
             self.all_sprites.add(self.player)
             self.active_powerup = None
@@ -77,14 +94,22 @@ class Game:
             self.num_of_enemies = 30
             chicken_width = 50
             chicken_height = 45
+            padding = 10
+            left_padding = 100 
+            right_padding = 100 
+            max_top_padding = 50
+            max_bottom_padding = 50
+            
+            # Calculate available height for enemies
+            available_width = self.screen_width - left_padding - right_padding
             
             # Calculate grid layout
-            columns = max(1, (self.screen_width // chicken_width) - 2)
-            rows = max(1, (self.num_of_enemies + columns - 1) // columns)
+            columns = max(1, (available_width // (chicken_width + padding)))
+            rows = (self.num_of_enemies + columns - 1) // columns
             
             # Calculate spacing
-            spacing_x = self.screen_width / (columns + 1)
-            spacing_y = (self.screen_height / 4) / (rows + 1)
+            spacing_x = (self.screen_width - (columns + 1) * padding) / columns
+            spacing_y = (self.screen_height / 4) / rows
             
             print(f"Creating enemy grid: {columns}x{rows}")
             print(f"Spacing: {spacing_x}x{spacing_y}")
@@ -99,15 +124,15 @@ class Game:
             enemies_created = 0
             for i in range(self.num_of_enemies):
                 try:
-                    x = (i % columns) * spacing_x + spacing_x
-                    y = (i // columns) * spacing_y + spacing_y
+                    x = left_padding + (i % columns) * (chicken_width + padding)
+                    y = max_top_padding + (i // columns) * (chicken_height + padding) + (chicken_height / 2)
                     position = (x, y)
                     
                     chicken = Chicken(position, sprite_sheet_path)
                     self.enemies.add(chicken)
                     self.all_sprites.add(chicken)
                     enemies_created += 1
-                    print(f"Created enemy {enemies_created}")
+                    print(f"Created enemy {enemies_created} at position {position}")
                     
                 except Exception as e:
                     print(f"Failed to create enemy {i}: {str(e)}")
@@ -119,10 +144,19 @@ class Game:
             print(f"Successfully created {enemies_created} enemies")
             
         except Exception as e:
-            print(f"Error setting up enemy grid: {str(e)}")
+            print(f"Failed to create enemy at position {position if 'position' in locals() else 'unknown'}: {str(e)}")
             raise   
-    
-       
+        
+    def move_enemies(self):
+        for chicken in self.enemies.sprites():
+            new_x = chicken.rect.x + (self.direction * self.movement_speed)
+
+            if new_x < 0 or new_x + chicken.rect.width > self.screen_width:
+                self.direction *= -1  # Reverse direction
+                return
+            
+            chicken.rect.x = new_x
+        
     def check_collisions(self):
         # Check laser collisions with enemies 
         for enemy in self.enemies.sprites():
@@ -134,16 +168,19 @@ class Game:
                         enemy.update(self.screen_width, self.screen_height)
                         self.player.score += 100
                     break
-                
-        for enemy in self.enemies:
+        
+        collected_food = set()
+        for enemy in self.enemies.sprites():
             if enemy.current_state == "food":
                 if enemy.rect.colliderect(self.player.rect):
-                    xp_gain = enemy.get_xp()  
-                    if xp_gain > 0:
-                        print(f"Gained {xp_gain} XP from food")
-                        self.player.add_xp(xp_gain)
+                    if enemy not in collected_food:
+                        xp_gain = enemy.get_xp()  
+                        if xp_gain > 0:
+                            print(f"Gained {xp_gain} XP from food")
+                            self.player.add_xp(xp_gain)
+                            collected_food.add(enemy)
                     enemy._remove_sprite()
-                    
+                        
         # Flatten the list of eggs from all the enemies
         for enemy in self.enemies:
             for egg in enemy.eggs[:]:  # Use a copy of the list to avoid modifying it during iteration
@@ -189,7 +226,6 @@ class Game:
         if Chicken.get_chicken_count() == 0 and not self.all_chickens_dead:
             self.all_chickens_dead = True
             self.handle_all_chickens_dead()
-
     # Added: Handle actions when all chickens are dead
     def handle_all_chickens_dead(self):
         self.round_transitioning = True
@@ -299,7 +335,9 @@ class Game:
             if enemy.current_state == "alive":
                 if random.random() < 0.001:
                     enemy.lay_eggs(self.all_sprites)
-                
+
+        self.move_enemies()
+                    
         # Draw all sprites
         for sprite in self.all_sprites:
             if not hasattr(sprite, "image") or not isinstance(sprite.image, pygame.Surface):
@@ -343,7 +381,6 @@ class Game:
         self.render_round_number()
         pygame.display.flip()
         
-
     def render_round_number(self):
         font = pygame.font.Font(None, 48)
         round_text = font.render(f"Round: {self.current_round}", True, (255, 255, 255))

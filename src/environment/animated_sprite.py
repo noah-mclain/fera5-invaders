@@ -17,6 +17,7 @@ class AnimatedSprite(pygame.sprite.Sprite):
             # Extract all frames
             self.frames = {}
             self.load_frames(sprite_type)  # Load frames based on sprite type
+            print(f"Available states after loading frames: {list(self.frames.keys())}")
             
             # Set up animation sequences based on sprite type
             self.setup_animations(sprite_type)  # Setup animations
@@ -25,7 +26,7 @@ class AnimatedSprite(pygame.sprite.Sprite):
             if initial_state not in self.frames or not self.frames[initial_state]:
                 raise ValueError(f"No '{initial_state}' frames loaded")
             
-            self.image = self.frames[initial_state][0][0]  # Get only the surface from the tuple
+            self.image = self.frames[initial_state][0][0]  
             self.rect = self.image.get_rect(topleft=position)
             
             # Track current animation state
@@ -33,6 +34,7 @@ class AnimatedSprite(pygame.sprite.Sprite):
             self.previous_animation = None
             
             self.last_update_time = pygame.time.get_ticks()
+            
         except Exception as e:
             print(f"Error initializing AnimatedSprite: {str(e)}")
             raise
@@ -45,17 +47,6 @@ class AnimatedSprite(pygame.sprite.Sprite):
                     "width": 45,
                     "height": 35,
                     "frames": [
-                        # {"name": "alive_frame_1", "x": 0, "y": 0, "width": 45, "height": 35},
-                        # {"name": "alive_frame_2", "x": 45, "y": 0, "width": 45, "height": 35},
-                        # {"name": "alive_frame_3", "x": 90, "y": 0, "width": 45, "height": 35},
-                        # {"name": "alive_frame_4", "x": 135, "y": 0, "width": 45, "height": 35},
-                        # {"name": "alive_frame_5", "x": 180, "y": 0, "width": 45, "height": 35},
-                        # {"name": "alive_frame_6", "x": 225, "y": 0, "width": 45, "height": 35},
-                        # {"name": "alive_frame_7", "x": 270, "y": 0, "width": 45, "height": 35},
-                        # {"name": "alive_frame_8", "x": 315, "y": 0, "width": 45, "height": 35},
-                        # {"name": "alive_frame_9", "x": 360, "y": 0, "width": 45, "height": 35},
-                        # {"name": "alive_frame_9", "x": 360, "y": 0, "width": 45, "height": 35},
-                        # {"name": "alive_frame_10", "x": 405, "y": 0, "width": 45, "height": 35},
                         {"name": f"chicken_frame_{i}", "x": i * 45, "y": 0} for i in range(10)  # Generates frames with x positions
                     ],
                     "scale": 1.5
@@ -72,9 +63,9 @@ class AnimatedSprite(pygame.sprite.Sprite):
                     "width": 45,
                     "height": 35,
                     "frames": [
-                        {"name": "chicken_leg", "x": 495, "y": 0, "width": 45, "height": 35},   # First food frame
-                        {"name": "double_chicken_leg", "x": 540, "y": 0, "width": 45, "height": 35},   # Second food frame
-                        {"name": "roast", "x": 585, "y": 0, "width": 45, "height": 35}    # Third food frame
+                        {"name": "chicken_leg", "x": 495, "y": 0, "width": 45, "height": 35},
+                        {"name": "double_chicken_leg", "x": 540, "y": 0, "width": 45, "height": 35},
+                        {"name": "roast", "x": 585, "y": 0, "width": 45, "height": 35}
                     ],
                     "scale": 1,
                 }
@@ -91,7 +82,7 @@ class AnimatedSprite(pygame.sprite.Sprite):
                     "width": 28,
                     "height": 24,
                     "frames": [
-                        {"name": "alive_frame_1", "x": 28, "y": 0, "width": 28, "height": 24},
+                        {"name": "broken_frame_1", "x": 28, "y": 0, "width": 28, "height": 24},
                         {"name": "broken_frame_2", "x": 56, "y": 0, "width": 28, "height": 24},
                         {"name": "broken_frame_3", "x": 81, "y": 0, "width": 28, "height": 24},
                         {"name": "broken_frame_4", "x": 109, "y": 0, "width": 28, "height": 24},
@@ -128,7 +119,7 @@ class AnimatedSprite(pygame.sprite.Sprite):
             raise ValueError(f"Unknown sprite type: {sprite_type}")
         
         # Extract frames for each animation state
-        self.frames = {}  # Change to dictionary to store frames by state
+        self.frames = {}
         
         for state, state_data in data.items():
             self.frames[state] = []
@@ -141,8 +132,8 @@ class AnimatedSprite(pygame.sprite.Sprite):
                 print(f"Processing {state} frame data: {frame_data}")
                 try:
                     # Ensure frame_data is a dictionary
-                    if isinstance(frame_data, int):
-                        raise ValueError(f"Expected frame data to be a dictionary, got int: {frame_data}")
+                    # if isinstance(frame_data, int):
+                    #     raise ValueError(f"Expected frame data to be a dictionary, got int: {frame_data}")
 
                     # Debugging output to check frame data
                     print(f"Processing {state} frame data: {frame_data}")
@@ -160,13 +151,16 @@ class AnimatedSprite(pygame.sprite.Sprite):
                     )
                     
                     if frame is not None:
-                        frame_data["surface"] = frame
-                        self.frames[state].append((frame, frame_data["name"]))  # Store tuple of (surface, name)
-                        print(f"Loaded {state} frame at position ({frame_data['x']}, {frame_data['y']}) with size {width}x{height}")
-                        
+                        self.frames[state].append((frame, frame_data["name"]))
+                        print(f"Loaded '{frame_data['name']}' for state '{state}'")
+                    
                 except Exception as e:
-                    print(f"Error loading {state} frame: {str(e)}")
-            
+                    print(f"Error loading frame for state '{state}' with data {frame_data}: {str(e)}")
+
+        # Debugging output
+        for state, frames in self.frames.items():
+            print(f"{state} frames loaded: {len(frames)}")
+
         # Debugging output
         for state, frames in self.frames.items():
             print(f"{state} frames loaded: {len(frames)}") 
@@ -199,6 +193,7 @@ class AnimatedSprite(pygame.sprite.Sprite):
                 if anim_name not in self.frames or not self.frames[anim_name]:
                     raise ValueError(f"No frames loaded for animation '{anim_name}'")
                 
+                print(f"Setting up animation '{anim_name}' with frames: {self.frames[anim_name]}")
                 self.animations[anim_name] = AnimationSequence(
                     self.frames[anim_name],
                     animation_speed=anim_info["speed"]
@@ -215,8 +210,19 @@ class AnimatedSprite(pygame.sprite.Sprite):
                 return current_anim.frames[current_anim.frame_index][1]  # Get the name from tuple
         return ""
 
-    def play_animation(self, animation_name, loop=True):
+    def play_animation(self, animation_name, loop=True, specific_frame=None):
         """Play the specified animation sequence"""
+        if specific_frame is not None:
+            print(f"Attempting to play specific frame: '{specific_frame}' from animation: '{animation_name}'")
+            
+            if animation_name in self.frames and specific_frame in [frame[1] for frame in self.frames[animation_name]]:
+                self.image = next(frame[0] for frame in self.frames[animation_name] if frame[1] == specific_frame)
+                self.current_animation = animation_name  
+                print(f"Playing specific frame '{specific_frame}' from '{animation_name}'")
+            else:
+                print(f"Frame '{specific_frame}' not found in animation '{animation_name}'")
+            return
+        
         if animation_name in self.animations:
             # Stop the previous animation if it exists
             if self.current_animation and self.current_animation != animation_name:
@@ -247,7 +253,7 @@ class AnimatedSprite(pygame.sprite.Sprite):
             current_anim = self.animations[self.current_animation]
             if current_anim.is_playing:
                 if current_time - self.last_update_time > current_anim.animation_speed * 1000:
-                    self.image = current_anim.update(pygame.time.get_ticks())[0]
+                    self.image = current_anim.update(current_time)[0]
                     self.last_update_time = current_time
             elif not current_anim.loop:
                 # If animation is done and not looping, keep the last frame
