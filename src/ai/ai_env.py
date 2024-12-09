@@ -83,8 +83,8 @@ class ai_env:
     # checks if the game is over
     def game_over(self):
         if self.game.running == False:
-            return False
-        return True
+            return 0
+        return 1
     
     # to calculate the reward/penalty for each action the AI takes
 

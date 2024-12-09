@@ -7,7 +7,7 @@ import gymnasium as gym
 import numpy as np
 from random import choice
 from random import sample
-
+import keras
 
 class AI:
     """

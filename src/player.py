@@ -37,6 +37,8 @@ class Player(StaticSprite):
         self.powerup_animation = None
         self.is_animating_powerup = False
         
+        self.game_instance = None # So that player can access the hearts later on 
+        
         super().__init__(initial_image_path, position, size)
 
     def shoot(self):
@@ -145,6 +147,10 @@ class Player(StaticSprite):
                 #print("Life restored!")
                 self.lives += 1
                 self.xp -= 1000
+                
+                # Trigger heart restoration animation
+                if hasattr(self.game_instance, 'hearts') and len(self.game_instance.hearts) > (self.lives - 1):
+                    self.game_instance.hearts[self.lives - 1].play_reverse_animation()
             else:
                 points_gained = (self.xp // 1000) * 500
                 #print(f"Converted {self.xp} XP to {points_gained} points")

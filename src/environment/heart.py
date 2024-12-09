@@ -10,6 +10,7 @@ class Heart(AnimatedSprite):
         self.current_state = "full"
         self.flickering = False
         self.flicker_count = 0 
+        self.flicker_delay = 200
         self.play_animation("full", loop=False)
         
     def lose_life(self):
@@ -20,31 +21,37 @@ class Heart(AnimatedSprite):
             self.flicker_count = 4
             self.play_animation("empty", loop=False)
             
-
+    def play_reverse_animation(self):
+        # Play the lose life animation in reverse to restore the life
+        print("Restoring life")
+        self.animation_done = False
+        self.play_animation("full", loop=False)
+        
     def update(self):
+        super().update()  # Call parent update to handle animation frames
+
         # Update the heart's state.
         if self.flickering:
-            # Check if we need to switch animations based on flicker count
-            if self.flicker_count > 0:
-                if self.current_animation == "empty":
-                    self.play_animation("full", loop=False)  # Switch to empty
-                else:
-                    self.play_animation("empty", loop=False)  # Switch back to full
-                
-                # Decrease flicker count after switching states
-                self.flicker_count -= 1
-                
-                # Delay before switching again (you can adjust this timing)
-                pygame.time.delay(200)  # Delay for 200 ms for visibility
+            current_time = pygame.time.get_ticks()
+            if current_time - self.last_update_time >= self.flicker_delay:
+                # Check if we need to switch animations based on flicker count
+                if self.flicker_count > 0:
+                    if self.current_animation == "empty":
+                        self.play_animation("full", loop=False)  # Switch to empty
+                    else:
+                        self.play_animation("empty", loop=False)  # Switch back to full
+                    
+                    # Decrease flicker count after switching states
+                    self.flicker_count -= 1
+                    self.last_update_time = current_time
+                    
+                # If flicker count reaches zero, set to empty state and stop flickering.
+                if self.flicker_count <= 0 and self.current_animation == "empty":
+                    self.current_state = "empty"
+                    print("Heart is now empty")
+                    self.flickering = False
+                    self.play_animation("empty", loop=False)
 
-            # If flicker count reaches zero, set to empty state and stop flickering.
-            if self.flicker_count <= 0 and self.current_animation == "empty":
-                self.current_state = "empty"
-                #print("Heart is now empty")
-                self.flickering = False
-                self.play_animation("empty", loop=False)
-
-        super().update()  # Call parent update to handle animation frames
 
     def draw(self, screen):
         # Draw the current image of the heart on the given surface.

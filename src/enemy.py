@@ -8,7 +8,13 @@ class Chicken(AnimatedSprite):
     chicken_counter = 0
 
     def __init__(self, position, sprite_sheet_path):
-        super().__init__(position, sprite_sheet_path, sprite_type="chicken", initial_state="alive")
+        try:
+            super().__init__(position, sprite_sheet_path, sprite_type="chicken", initial_state="alive")
+            print(f"Initialized chicken at position {position}")
+        except Exception as e:
+            print(f"Error initializing Chicken: {str(e)}")
+            raise
+        
         self.isChickenAlive = True
         self.speed_x = 5
         self.direction = 1
@@ -19,7 +25,6 @@ class Chicken(AnimatedSprite):
         
         # Start with alive animation
         self.play_animation("alive", loop=True)
-        self.food_frames = ["chicken_leg", "double_chicken_leg", "roast"]
         
         # Track states
         self.is_food = False
@@ -32,19 +37,20 @@ class Chicken(AnimatedSprite):
         #print(f"Current state: {self.current_state}, Animation: {self.current_animation}")
         
         # Update position based on current state
-        if self.current_state == "alive":
-            if screenWidth is not None and screenHeight is not None:
-                self.x += self.speed_x * self.direction
-                self.rect.x = self.x
+        # if self.current_state == "alive":
+        #     if screenWidth is not None and screenHeight is not None:
+        #         self.x += self.speed_x * self.direction
+        #         self.rect.x = self.x
 
-                # Handle screen boundaries
-                if self.rect.left <= 0:
-                    self.direction = 1
-                elif self.rect.right >= screenWidth:
-                    self.direction = -1
+        #         # Handle screen boundaries
+        #         if self.rect.left <= 0:
+        #             self.direction = 1
+        #         elif self.rect.right >= screenWidth:
+        #             self.direction = -1
                     
-        elif self.current_state == "dead":
-            self._switch_to_food()
+        if self.current_state == "dead":
+            if self.animation_done:
+                self._switch_to_food()
         elif self.current_state == "food":
             self.y += self.fall_speed
             self.rect.y = self.y
@@ -58,9 +64,6 @@ class Chicken(AnimatedSprite):
             
             if egg.should_disappear():
                 egg._remove_sprite()
-            
-        # Remove any eggs that have disappeared
-        #self.eggs = [egg for egg in self.eggs if not egg.should_disappear()]
         
         # Always update the current animation
         super().update()
@@ -84,22 +87,31 @@ class Chicken(AnimatedSprite):
             self.isChickenAlive = False
             self.current_state = "dead"
             self.stop_animation()
-            if 'dead' in self.animations:
+            if "dead" in self.animations:
                 self.play_animation("dead", loop=False)
-            #print("playing dead animation")
-            # self.animations["dead"].callback = self._switch_to_food
-            
+                print("playing dead animation")
+
             Chicken.chicken_counter -= 1
 
     def _switch_to_food(self):
         """Helper method to switch to food state"""
-        if self.current_state == "dead":  # Only switch if we're in dead state
-            #print("Switching to food")
+        if self.current_state == "dead":
+            print("Switching to food")
             self.current_state = "food"
             self.stop_animation()
+            
+            # Randomly select one of the food frames
+            food_frame = random.choice(["chicken_leg", "double_chicken_leg", "roast"]) 
+            
+            print(f"Selected food frame: {food_frame}")
+                
             if "food" in self.animations:
-                self.play_animation("food", loop=False)
-                self.is_food = True
+                print(f"Playing {food_frame} animation")
+                if food_frame in [frame[1] for frame in self.frames["food"]]:
+                    self.play_animation("food", loop=False, specific_frame=food_frame)
+                    self.is_food = True
+            else:
+                print(f"Warning: Food frame '{food_frame}' not found in animations.")
                 
     def get_xp(self):
         """Return the XP value based on the current state"""

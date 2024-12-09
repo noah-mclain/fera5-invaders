@@ -20,6 +20,14 @@ class GameAI(game.Game):
             clock.tick(60)
             self.experience_count+=1
             action = self.agent.get_action()
+            if action == "shoot":
+                action_number = 0
+            elif action == "stop":
+                action_number = 1
+            elif action == "right":
+                action_number = 2
+            else:
+                action_number = 3
             state = self.environment.get_state()
             # left, right, shoot , stop
             next_state, reward, done =self.environment.step(action)
