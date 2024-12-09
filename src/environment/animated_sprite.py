@@ -10,7 +10,7 @@ class AnimatedSprite(pygame.sprite.Sprite):
         
         try:
             # Load sprite sheet
-            print(f"Loading sprite sheet from: {sprite_sheet_path}")
+            # print(f"Loading sprite sheet from: {sprite_sheet_path}")
             self.sprite_sheet_image = pygame.image.load(sprite_sheet_path).convert_alpha()
             self.sprite_sheet = SpriteSheet(self.sprite_sheet_image)
             
@@ -128,7 +128,7 @@ class AnimatedSprite(pygame.sprite.Sprite):
                         raise ValueError(f"Expected frame data to be a dictionary, got int: {frame_data}")
 
                     # Debugging output to check frame data
-                    print(f"Processing {state} frame data: {frame_data}")
+                    # print(f"Processing {state} frame data: {frame_data}")
                     
                     width = frame_data.get("width", state_data["width"])
                     height = frame_data.get("height", state_data["height"])
@@ -145,14 +145,15 @@ class AnimatedSprite(pygame.sprite.Sprite):
                     if frame is not None:
                         frame_data["surface"] = frame
                         self.frames[state].append((frame, frame_data["name"]))  # Store tuple of (surface, name)
-                        print(f"Loaded {state} frame at position ({frame_data['x']}, {frame_data['y']}) with size {width}x{height}")
+                        #print(f"Loaded {state} frame at position ({frame_data['x']}, {frame_data['y']}) with size {width}x{height}")
                         
                 except Exception as e:
                     print(f"Error loading {state} frame: {str(e)}")
             
         # Debugging output
         for state, frames in self.frames.items():
-            print(f"{state} frames loaded: {len(frames)}") 
+            #print(f"{state} frames loaded: {len(frames)}")
+             ... 
     
     def setup_animations(self, sprite_type):
         animation_data = {

@@ -52,7 +52,7 @@ class Egg(AnimatedSprite):
             if 'broken' in self.animations:
                 self.play_animation("broken", loop=False)
                 self.isBreaking = True
-                print("playing broken animation")
+                #print("playing broken animation")
 
         #if egg hits spaceship?
     

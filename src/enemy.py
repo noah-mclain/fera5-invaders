@@ -29,7 +29,7 @@ class Chicken(AnimatedSprite):
     def update(self, screenWidth=None, screenHeight=None):
         """Update chicken's position and animation."""
         # Debug logging
-        print(f"Current state: {self.current_state}, Animation: {self.current_animation}")
+        #print(f"Current state: {self.current_state}, Animation: {self.current_animation}")
         
         # Update position based on current state
         if self.current_state == "alive":
@@ -86,7 +86,7 @@ class Chicken(AnimatedSprite):
             self.stop_animation()
             if 'dead' in self.animations:
                 self.play_animation("dead", loop=False)
-            print("playing dead animation")
+            #print("playing dead animation")
             # self.animations["dead"].callback = self._switch_to_food
             
             Chicken.chicken_counter -= 1
@@ -94,12 +94,10 @@ class Chicken(AnimatedSprite):
     def _switch_to_food(self):
         """Helper method to switch to food state"""
         if self.current_state == "dead":  # Only switch if we're in dead state
-            print("Switching to food")
+            #print("Switching to food")
             self.current_state = "food"
             self.stop_animation()
             if "food" in self.animations:
-                # self.animations["food"].frame_index = 0  # Reset frame index
-                # self.animations["food"].last_update = pygame.time.get_ticks()  # Reset timer
                 self.play_animation("food", loop=False)
                 self.is_food = True
                 
@@ -131,7 +129,7 @@ class Chicken(AnimatedSprite):
         new_egg = Egg(egg_x, egg_y)
         self.eggs.append(new_egg)
         all_sprites.add(new_egg)
-        print(f"Laying egg at position: ({egg_x}, {egg_y})")  
+        #print(f"Laying egg at position: ({egg_x}, {egg_y})")  
         return Egg(egg_x, egg_y)
     
     def set_alpha(self, alpha_value):

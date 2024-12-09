@@ -4,21 +4,21 @@ class SpriteSheet():
     def __init__(self, image):
         self.sheet = image
         sheet_width, sheet_height = self.sheet.get_size()
-        print(f"Sprite sheet dimensions: {sheet_width}x{sheet_height}")
+        #print(f"Sprite sheet dimensions: {sheet_width}x{sheet_height}")
         
     def get_image_at_pos(self, x, y, width, height, scale=1, color=None):
         try:
             sheet_width, sheet_height = self.sheet.get_size()
             
-            print(f"Attempting to extract frame:")
-            print(f"- Sheet size: {sheet_width}x{sheet_height}")
-            print(f"- Extraction area: x={x}, y={y}, width={width}, height={height}")
+            #print(f"Attempting to extract frame:")
+            #print(f"- Sheet size: {sheet_width}x{sheet_height}")
+            #print(f"- Extraction area: x={x}, y={y}, width={width}, height={height}")
             
             # Validate extraction coordinates
             if x < 0 or y < 0 or x + width > sheet_width or y + height > sheet_height:
-                print("WARNING: Extraction coordinates out of bounds!")
-                print(f"- Right edge would be: {x + width}")
-                print(f"- Bottom edge would be: {y + height}")
+                #print("WARNING: Extraction coordinates out of bounds!")
+                #print(f"- Right edge would be: {x + width}")
+                #print(f"- Bottom edge would be: {y + height}")
                 return None  # Return None if out of bounds
             
             # Create a new surface for the frame

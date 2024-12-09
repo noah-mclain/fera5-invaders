@@ -115,7 +115,7 @@ class Player(StaticSprite):
     def lose_life(self):
         if self.lives > 0:
             self.lives -= 1
-            print(f"Remaining lives: {self.lives}")
+            #print(f"Remaining lives: {self.lives}")
             return True
         return False   
         
@@ -136,17 +136,17 @@ class Player(StaticSprite):
        
     def add_xp(self, amount):
         """Add XP and handle life restoration or point conversion."""
-        print(f"XP gained: {amount}. Total XP before addition: {self.xp}")
+        #print(f"XP gained: {amount}. Total XP before addition: {self.xp}")
         
         self.xp += amount
         
         while self.xp >= 1000:
             if self.lives < MAX_LIVES:
-                print("Life restored!")
+                #print("Life restored!")
                 self.lives += 1
                 self.xp -= 1000
             else:
                 points_gained = (self.xp // 1000) * 500
-                print(f"Converted {self.xp} XP to {points_gained} points")
+                #print(f"Converted {self.xp} XP to {points_gained} points")
                 self.score += points_gained
                 self.xp %= 1000  # Keep remainder of XP after conversion

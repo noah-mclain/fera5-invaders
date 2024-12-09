@@ -10,15 +10,18 @@ class ai_env:
         self.enemies = game.enemies
         self.score = 0
         self.actions=["right", "left", "shoot", "stop"]  
+        self.hit_enemies = 0
+        self.eaten_chicken = 0
+        self.egg_hit_by_laser = 0
+        self.player_hit_by_egg = 0
+        self.player_death = False
 
     # returns all possible actions in a given state        
     def available_actions(self):
         available_actions = ["shoot", "stop"]
         if self.player.rect.x < self.game.screen_width:
-            print("hi!")
             available_actions.append("right")
         if self.player.rect.x > 0:
-            print("yo!")
             available_actions.append("left")
         return available_actions
     
@@ -86,15 +89,21 @@ class ai_env:
     # to calculate the reward/penalty for each action the AI takes
 
     def calculate_reward(self):
-        return 0
         reward=0
-        
-        if self.player.hit_enemy :
-            reward+=10
-        if self.powerup.got_powerup:
-            reward+=5
-        if self.enemy.got_hit_by_enemy or self.enemy.got_hit_by_egg:
-            reward-=10
-        
+        reward+= 10 * self.hit_enemies
+        self.hit_enemies = 0
+        reward+= 5 * self.eaten_chicken
+        self.eaten_chicken = 0
+        reward+= 2 * self.egg_hit_by_laser
+        self.egg_hit_by_laser = 0
+        reward-= 30 * self.player_hit_by_egg
+        self.player_hit_by_egg = 0
+        if self.player_death:
+            reward -=1000
+        else:
+            reward += 250
+        reward += self.score * 0.01
         return reward
+
+
 

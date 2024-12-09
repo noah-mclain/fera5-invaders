@@ -13,7 +13,7 @@ from powerup import PowerUp  # Added to handle power-ups
 
 class Game:
     def __init__(self):
-        print("Initializing Game...")
+        # print("Initializing Game...")
         # Initialize pygame
         if not pygame.get_init():
             pygame.init()
@@ -23,14 +23,14 @@ class Game:
             info = pygame.display.Info()
             self.screen_width = min(info.current_w, 1920)
             self.screen_height = min(info.current_h, 1080)
-            print(f"Screen dimensions: {self.screen_width}x{self.screen_height}")
+            #print(f"Screen dimensions: {self.screen_width}x{self.screen_height}")
             
             # Create screen
             self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
             if not self.screen:
                 raise RuntimeError("Failed to create display")
             
-            print("Display created successfully")
+            #print("Display created successfully")
             
             pygame.display.set_caption("Fera5 Invaders")
             
@@ -85,8 +85,8 @@ class Game:
             spacing_x = self.screen_width / (columns + 1)
             spacing_y = (self.screen_height / 4) / (rows + 1)
             
-            print(f"Creating enemy grid: {columns}x{rows}")
-            print(f"Spacing: {spacing_x}x{spacing_y}")
+            #print(f"Creating enemy grid: {columns}x{rows}")
+            #print(f"Spacing: {spacing_x}x{spacing_y}")
             
             # Create enemies
             sprite_sheet_path = path.join("assets", "images", "Enemy", "chickenRedSpriteSheet.png")
@@ -106,7 +106,7 @@ class Game:
                     self.enemies.add(chicken)
                     self.all_sprites.add(chicken)
                     enemies_created += 1
-                    print(f"Created enemy {enemies_created}")
+                    #print(f"Created enemy {enemies_created}")
                     
                 except Exception as e:
                     print(f"Failed to create enemy {i}: {str(e)}")
@@ -115,7 +115,7 @@ class Game:
             if enemies_created == 0:
                 raise RuntimeError("No enemies were created successfully")
             
-            print(f"Successfully created {enemies_created} enemies")
+            #print(f"Successfully created {enemies_created} enemies")
             
         except Exception as e:
             print(f"Error setting up enemy grid: {str(e)}")
@@ -139,7 +139,7 @@ class Game:
                 if enemy.rect.colliderect(self.player.rect):
                     xp_gain = enemy.get_xp()  
                     if xp_gain > 0:
-                        print(f"Gained {xp_gain} XP from food")
+                        # print(f"Gained {xp_gain} XP from food")
                         self.player.add_xp(xp_gain)
                     enemy._remove_sprite()
         # Flatten the list of eggs from all the enemies
@@ -161,15 +161,15 @@ class Game:
                         if self.player.lose_life():
                             # Trigger the flickering on that heart
                             if len(self.hearts) > (self.player.lives):  
-                                print(f"Losing life: {self.player.lives}")
+                                #print(f"Losing life: {self.player.lives}")
                                 self.hearts[self.player.lives].lose_life()
                             
                             # Check if player is alive after losing life
                             if not self.player.is_alive():
-                                print("Player has no lives left.")
+                                #print("Player has no lives left.")
                                 self.game_over()  # Call game over if player has no lives left
                         else:
-                            print("Player has no lives left.")
+                            #print("Player has no lives left.")
                             self.game_over()
                             
                         # Do not mark as disappeared immediately; let animation play first
@@ -194,7 +194,7 @@ class Game:
         self.frozen_start_time = pygame.time.get_ticks()
         self.current_round +=1
         self.score += 10000
-        print(f"All chickens defeated! Starting round {self.current_round}...")
+        # print(f"All chickens defeated! Starting round {self.current_round}...")
 
         # Create a PowerUp and store it
         self.active_powerup = PowerUp(powerup_type="increment_laser", laser_increment=1)
@@ -234,7 +234,7 @@ class Game:
         self.paused = not self.paused
   
     def run(self):
-        print("Game loop started.")
+        # print("Game loop started.")
         clock = pygame.time.Clock() 
         
         while self.running:

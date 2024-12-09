@@ -15,7 +15,7 @@ class Heart(AnimatedSprite):
     def lose_life(self):
         # Start the flickering animation when the player loses a life
         if self.current_state == "full":
-            print("Heart is flickering")
+            #print("Heart is flickering")
             self.flickering = True
             self.flicker_count = 4
             self.play_animation("empty", loop=False)
@@ -40,7 +40,7 @@ class Heart(AnimatedSprite):
             # If flicker count reaches zero, set to empty state and stop flickering.
             if self.flicker_count <= 0 and self.current_animation == "empty":
                 self.current_state = "empty"
-                print("Heart is now empty")
+                #print("Heart is now empty")
                 self.flickering = False
                 self.play_animation("empty", loop=False)
 

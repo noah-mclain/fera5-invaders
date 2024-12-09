@@ -18,6 +18,7 @@ class AI:
         self.alpha = alpha
         self.epsilon = epsilon
         self.model=model
+        self.model.compile(optimizer='adam', loss='mse')
         self.decay_rate = 0.02
         self.replay_memory = []
         self.memory_capacity = 10000
@@ -29,7 +30,7 @@ class AI:
         self.input_nodes = self.environment.input_nodes()
         return self.input_nodes
     
-    """decides which action to take, expolit or explore, and the espilon's value decreases gradually to increase the probability of exploitation """
+    """decides which action to take, exploit or explore, and the espilon's value decreases gradually to increase the probability of exploitation """
     def get_action(self):
         state = self.environment.get_state()
         state = np.array(state).reshape(1,-1)
@@ -38,8 +39,6 @@ class AI:
 
         if probability <= self.epsilon:
             # implement exploration logic here
-            print(self.environment.available_actions())
-            print(self.epsilon)
             action = choice(self.environment.available_actions())
         
         else:
@@ -59,19 +58,27 @@ class AI:
             return
         batch = sample(self.replay_memory, self.batch_size)
         states, actions, rewards, next_states, dones = zip(*batch)
-        states = np.array(states)
-        next_states = np.array(next_states)
-        q_values = np.array(rewards)
-        next_q_values = self.model.predict(next_states)
-
+        #states = [np.array(state, dtype=np.float32) for state in states]
+        #next_states = [np.array(next_state, dtype=np.float32) for next_state in next_states]
+        q_values = np.array([np.zeros(4, dtype=np.float32) for _ in range(self.batch_size)])
+        max_shape = self.environment.input_nodes()
+        states = [np.pad(array, (0, max_shape - len(array)), constant_values=0) for array in states]
+        next_states = [np.pad(array, (0, max_shape - len(array)), constant_values=0) for array in next_states]
+        # print(states)
+        #states = np.array(states, dtype=np.float32)
+        #next_states = np.array(next_states, dtype=np.float32)
+       # q_values = np.array(rewards, dtype=np.float32)
+        
+        next_q_values = self.model(np.stack(next_states))
+        mapping = {"right" : 0, "left" : 1, "shoot" : 2, "stop" : 3}
         for i in range(self.batch_size):
             if dones[i]:
-                q_values[i][actions[i]] = rewards[i]
+                q_values[i][mapping[actions[i]]] = rewards[i]
             else:
-                max = np.argmax(next_q_values)
-                q_values[i][actions[i]] =  rewards[i] + gamma * next_q_values[max]
+                max = np.max(next_q_values[i])
+                q_values[i][mapping[actions[i]]] =  rewards[i] + gamma * next_q_values[max]
 
-        self.model.fit(states, q_values, verbose = 1)
+        self.model.fit(np.stack(states), np.stack(q_values), verbose = 1)
 
         
     # state, action, reward, next_state, done
@@ -80,7 +87,7 @@ class AI:
         if len(self.replay_memory) > self.memory_capacity:
             self.replay_memory.pop(0)
         self.replay_memory.append((state, action, reward, next_state, done))
-        print(self.replay_memory)
+        #print(self.replay_memory)
         
     """decreases the Epsilon's value gradually"""
     def update_epsilon(self):

@@ -1,6 +1,7 @@
 import pygame
 import sys
 from game import Game
+from gameAI import GameAI
 from menu import GameMenu
 
 def check_dependencies():
@@ -23,27 +24,29 @@ def check_dependencies():
     return True
 
 def run_game():
-    print("Initializing pygame...")
+    # print("Initializing pygame...")
     pygame.init()
 
-    print("Setting up display...")
+    # print("Setting up display...")
     pygame.display.init()
 
-    print("Creating game menu...")
+    # print("Creating game menu...")
     menu = GameMenu()
 
-    print("Running menu loop...")
+    # print("Running menu loop...")
     choice = menu.menu_loop()  # Get user selection from menu
 
     if choice == "start_game":
-        print("Starting the game...")
-        game = Game()
-        print("Game created successfully")
+        # print("Starting the game...")
+        game = GameAI()
+        # print("Game created successfully")
         game.run()
 
     elif choice == "play_as_ai":
-        print("You are playing as AI...")
+        # print("You are playing as AI...")
         # Implement AI logic here
+        game = GameAI()
+        game.run()
 
     elif choice == "train_ai":
         print("Training AI...")

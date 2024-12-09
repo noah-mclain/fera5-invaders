@@ -45,10 +45,10 @@ class PowerUp(pygame.sprite.Sprite):
         self.play_powerup_effect()
         if self.type == "increment_laser":
             player.laser_count += self.laser_increment
-            print(f"Laser count increased to {player.laser_count}!")
+            #print(f"Laser count increased to {player.laser_count}!")
         elif self.type == "change_laser":
             player.laser_type = self.laser_type
-            print(f"Laser type changed to {player.laser_type}!")
+            #print(f"Laser type changed to {player.laser_type}!")
         
     def play_powerup_effect(self):
         self.powerup_sound.play()

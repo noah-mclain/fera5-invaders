@@ -5,9 +5,9 @@ import tensorflow as tf
 
 class DQNMODEL(tf.keras.Model):
     """ initializing the model using keras' layers class """
-    def __init__(self, input_size, num_actions):
+    def __init__(self, num_actions):
         super(DQNMODEL, self).__init__()
-        self.dense1 = tf.keras.layers.Dense(64, activation = 'relu', input_shape = (input_size))
+        self.dense1 = tf.keras.layers.Dense(64, activation = 'relu')
         self.dense2 = tf.keras.layers.Dense(32, activation='relu')
         self.dense3 = tf.keras.layers.Dense(16, activation = 'relu')
         self.outputLayer=tf.keras.layers.Dense(num_actions,activation=None)
