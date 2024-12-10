@@ -36,12 +36,15 @@ class Player(StaticSprite):
         self.flicker_timer = 0
         self.powerup_animation = None
         self.is_animating_powerup = False
+        self.max_laser_count = 10
         
         self.game_instance = None # So that player can access the hearts later on 
         
         super().__init__(initial_image_path, position, size)
 
     def shoot(self):
+        if len(self.lasers) == 10:
+            return
         if len(self.lasers) < self.laser_count:
             total_spread = 5  # Total spread angle in degrees (adjust as desired)
             if self.laser_count == 1:

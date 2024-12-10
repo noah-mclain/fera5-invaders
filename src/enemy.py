@@ -10,7 +10,7 @@ class Chicken(AnimatedSprite):
     def __init__(self, position, sprite_sheet_path):
         try:
             super().__init__(position, sprite_sheet_path, sprite_type="chicken", initial_state="alive")
-            print(f"Initialized chicken at position {position}")
+            #print(f"Initialized chicken at position {position}")
         except Exception as e:
             print(f"Error initializing Chicken: {str(e)}")
             raise
@@ -89,24 +89,24 @@ class Chicken(AnimatedSprite):
             self.stop_animation()
             if "dead" in self.animations:
                 self.play_animation("dead", loop=False)
-                print("playing dead animation")
+                #print("playing dead animation")
 
             Chicken.chicken_counter -= 1
 
     def _switch_to_food(self):
         """Helper method to switch to food state"""
         if self.current_state == "dead":
-            print("Switching to food")
+            #print("Switching to food")
             self.current_state = "food"
             self.stop_animation()
             
             # Randomly select one of the food frames
             food_frame = random.choice(["chicken_leg", "double_chicken_leg", "roast"]) 
             
-            print(f"Selected food frame: {food_frame}")
+            #print(f"Selected food frame: {food_frame}")
                 
             if "food" in self.animations:
-                print(f"Playing {food_frame} animation")
+                #print(f"Playing {food_frame} animation")
                 if food_frame in [frame[1] for frame in self.frames["food"]]:
                     self.play_animation("food", loop=False, specific_frame=food_frame)
                     self.is_food = True

@@ -7,7 +7,7 @@ import gymnasium as gym
 import numpy as np
 from random import choice
 from random import sample
-import keras
+
 
 class AI:
     """
@@ -39,7 +39,9 @@ class AI:
 
         if probability <= self.epsilon:
             # implement exploration logic here
-            action = choice(self.environment.available_actions())
+            actions = self.environment.available_actions()
+            action = choice(actions)
+            #print(action)
         
         else:
             # implement exploitation logic here
@@ -62,21 +64,20 @@ class AI:
         #next_states = [np.array(next_state, dtype=np.float32) for next_state in next_states]
         q_values = np.array([np.zeros(4, dtype=np.float32) for _ in range(self.batch_size)])
         max_shape = self.environment.input_nodes()
-        states = [np.pad(array, (0, max_shape - len(array)), constant_values=0) for array in states]
-        next_states = [np.pad(array, (0, max_shape - len(array)), constant_values=0) for array in next_states]
+        states = [np.pad(array, (0, max(0, max_shape - len(array))), constant_values=0) for array in states]
+        next_states = [np.pad(array, (0, max(0,max_shape - len(array))), constant_values=0) for array in next_states]
         # print(states)
         #states = np.array(states, dtype=np.float32)
         #next_states = np.array(next_states, dtype=np.float32)
-       # q_values = np.array(rewards, dtype=np.float32)
-        
+        #q_values = np.array(rewards, dtype=np.float32)
         next_q_values = self.model(np.stack(next_states))
         mapping = {"right" : 0, "left" : 1, "shoot" : 2, "stop" : 3}
         for i in range(self.batch_size):
             if dones[i]:
                 q_values[i][mapping[actions[i]]] = rewards[i]
             else:
-                max = np.max(next_q_values[i])
-                q_values[i][mapping[actions[i]]] =  rewards[i] + gamma * next_q_values[max]
+                max_q_value = np.max(next_q_values[i])
+                q_values[i][mapping[actions[i]]] =  rewards[i] + gamma * next_q_values[max_q_value]
 
         self.model.fit(np.stack(states), np.stack(q_values), verbose = 1)
 

@@ -23,7 +23,7 @@ class Heart(AnimatedSprite):
             
     def play_reverse_animation(self):
         # Play the lose life animation in reverse to restore the life
-        print("Restoring life")
+        #print("Restoring life")
         self.animation_done = False
         self.play_animation("full", loop=False)
         
@@ -48,7 +48,7 @@ class Heart(AnimatedSprite):
                 # If flicker count reaches zero, set to empty state and stop flickering.
                 if self.flicker_count <= 0 and self.current_animation == "empty":
                     self.current_state = "empty"
-                    print("Heart is now empty")
+                    #print("Heart is now empty")
                     self.flickering = False
                     self.play_animation("empty", loop=False)
 

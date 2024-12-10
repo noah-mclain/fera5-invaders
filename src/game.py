@@ -62,13 +62,13 @@ class Game:
 
             self.hearts = []
             for i in range(self.player.lives):
-                print(f"Initializing heart {i + 1} at position: ({self.screen_width - (i + 1) * 70}, 20)")
+                # print(f"Initializing heart {i + 1} at position: ({self.screen_width - (i + 1) * 70}, 20)")
                 try:
                     heart = Heart((self.screen_width - (i + 1) * 70, 20))
                     heart.rect.size = (60, 60)
                     self.hearts.append(heart)
                     self.all_sprites.add(heart)
-                    print(f"Heart {i + 1} initialized successfully.")
+                    # print(f"Heart {i + 1} initialized successfully.")
                 except KeyError as e:
                     print(f"KeyError while initializing heart {i + 1}: {str(e)}")
                 except Exception as e:
@@ -85,10 +85,14 @@ class Game:
             self.setup_enemy_grid()
                     
         except Exception as e:
-            print(f"Game initialization error: {str(e)}")
+            # print(f"Game initialization error: {str(e)}")
             raise
     
     def setup_enemy_grid(self):
+        for enemy in self.enemies.sprites():
+            enemy._remove_sprite()
+        self.enemies.empty()
+
         try:
             # Enemy grid configuration
             self.num_of_enemies = 30
@@ -132,7 +136,7 @@ class Game:
                     self.enemies.add(chicken)
                     self.all_sprites.add(chicken)
                     enemies_created += 1
-                    print(f"Created enemy {enemies_created} at position {position}")
+                    # print(f"Created enemy {enemies_created} at position {position}")
                     
                 except Exception as e:
                     print(f"Failed to create enemy {i}: {str(e)}")
@@ -176,7 +180,7 @@ class Game:
                     if enemy not in collected_food:
                         xp_gain = enemy.get_xp()  
                         if xp_gain > 0:
-                            print(f"Gained {xp_gain} XP from food")
+                            # print(f"Gained {xp_gain} XP from food")
                             self.player.add_xp(xp_gain)
                             collected_food.add(enemy)
                     enemy._remove_sprite()
@@ -221,11 +225,11 @@ class Game:
                     enemy.eggs.remove(egg)  # Remove from enemy's eggs list
                     self.all_sprites.remove(egg)  # Remove from all sprites group
 
-
         # Added: Check if all chickens are dead
         if Chicken.get_chicken_count() == 0 and not self.all_chickens_dead:
             self.all_chickens_dead = True
             self.handle_all_chickens_dead()
+            
     # Added: Handle actions when all chickens are dead
     def handle_all_chickens_dead(self):
         self.round_transitioning = True
@@ -233,7 +237,7 @@ class Game:
         self.frozen_start_time = pygame.time.get_ticks()
         self.current_round +=1
         self.player.score += 10000
-        print(f"All chickens defeated! Starting round {self.current_round}...")
+        # print(f"All chickens defeated! Starting round {self.current_round}...")
 
         # Create a PowerUp and store it
         self.active_powerup = PowerUp(powerup_type="increment_laser", laser_increment=1)

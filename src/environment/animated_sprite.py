@@ -17,7 +17,7 @@ class AnimatedSprite(pygame.sprite.Sprite):
             # Extract all frames
             self.frames = {}
             self.load_frames(sprite_type)  # Load frames based on sprite type
-            print(f"Available states after loading frames: {list(self.frames.keys())}")
+            # print(f"Available states after loading frames: {list(self.frames.keys())}")
             
             # Set up animation sequences based on sprite type
             self.setup_animations(sprite_type)  # Setup animations
@@ -125,11 +125,11 @@ class AnimatedSprite(pygame.sprite.Sprite):
             self.frames[state] = []
             for frame_data in state_data.get("frames", []):
                 if not isinstance(frame_data, dict):
-                    print(f"Warning: Expected frame data to be a dictionary, got: {frame_data}")
+                    # print(f"Warning: Expected frame data to be a dictionary, got: {frame_data}")
                     continue  # Skip invalid frame data
                 
                 # Debugging output
-                print(f"Processing {state} frame data: {frame_data}")
+                # print(f"Processing {state} frame data: {frame_data}")
                 try:
                     # Ensure frame_data is a dictionary
                     # if isinstance(frame_data, int):
@@ -152,19 +152,19 @@ class AnimatedSprite(pygame.sprite.Sprite):
                     
                     if frame is not None:
                         self.frames[state].append((frame, frame_data["name"]))
-                        print(f"Loaded '{frame_data['name']}' for state '{state}'")
+                        # print(f"Loaded '{frame_data['name']}' for state '{state}'")
                     
                 except Exception as e:
                     print(f"Error loading frame for state '{state}' with data {frame_data}: {str(e)}")
 
         # Debugging output
-        for state, frames in self.frames.items():
-            print(f"{state} frames loaded: {len(frames)}")
+        # for state, frames in self.frames.items():
+        #     print(f"{state} frames loaded: {len(frames)}")
 
         # Debugging output
-        for state, frames in self.frames.items():
+        # for state, frames in self.frames.items():
             #print(f"{state} frames loaded: {len(frames)}")
-             ... 
+           
     
     def setup_animations(self, sprite_type):
         animation_data = {
@@ -194,7 +194,7 @@ class AnimatedSprite(pygame.sprite.Sprite):
                 if anim_name not in self.frames or not self.frames[anim_name]:
                     raise ValueError(f"No frames loaded for animation '{anim_name}'")
                 
-                print(f"Setting up animation '{anim_name}' with frames: {self.frames[anim_name]}")
+                #print(f"Setting up animation '{anim_name}' with frames: {self.frames[anim_name]}")
                 self.animations[anim_name] = AnimationSequence(
                     self.frames[anim_name],
                     animation_speed=anim_info["speed"]
@@ -214,12 +214,12 @@ class AnimatedSprite(pygame.sprite.Sprite):
     def play_animation(self, animation_name, loop=True, specific_frame=None):
         """Play the specified animation sequence"""
         if specific_frame is not None:
-            print(f"Attempting to play specific frame: '{specific_frame}' from animation: '{animation_name}'")
+            #print(f"Attempting to play specific frame: '{specific_frame}' from animation: '{animation_name}'")
             
             if animation_name in self.frames and specific_frame in [frame[1] for frame in self.frames[animation_name]]:
                 self.image = next(frame[0] for frame in self.frames[animation_name] if frame[1] == specific_frame)
                 self.current_animation = animation_name  
-                print(f"Playing specific frame '{specific_frame}' from '{animation_name}'")
+                # print(f"Playing specific frame '{specific_frame}' from '{animation_name}'")
             else:
                 print(f"Frame '{specific_frame}' not found in animation '{animation_name}'")
             return

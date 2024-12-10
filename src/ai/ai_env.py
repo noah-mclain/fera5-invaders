@@ -28,12 +28,11 @@ class ai_env:
     # performs the current action chosen by the AI 
     def step(self,action): 
         if action=="right":
-            self.player.move(-3.7)
-        elif action=="left":
             self.player.move(3.7)
+        elif action=="left":
+            self.player.move(-3.7)
         elif action=="shoot":
             self.player.shoot()
-        
         #self.game.update()
         
         reward=self.calculate_reward()
@@ -48,8 +47,8 @@ class ai_env:
     # to calculate the number of the input nodes  
     def input_nodes(self):
         player_nodes = 2
-        MAX_chicken_nodes = 40 * 2
-        MAX_egg_nodes = MAX_chicken_nodes
+        MAX_chicken_nodes = 30 * 2
+        MAX_egg_nodes = MAX_chicken_nodes * 15
         MAX_laser_nodes = 20
         MAX_powerups_nodes = 6
         total_nodes = player_nodes + MAX_chicken_nodes + MAX_egg_nodes + MAX_laser_nodes + MAX_powerups_nodes
@@ -105,5 +104,6 @@ class ai_env:
         reward += self.score * 0.01
         return reward
 
-
+    def reassign_player(self, player):
+        self.player = player
 

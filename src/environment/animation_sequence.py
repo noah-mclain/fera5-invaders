@@ -36,7 +36,7 @@ class AnimationSequence:
         if 0 <= self.frame_index < len(self.frames):
             return self.frames[self.frame_index]
         else:
-            print(f"Warning: Invalid frame index {self.frame_index}. Total frames: {len(self.frames)}")
+            #print(f"Warning: Invalid frame index {self.frame_index}. Total frames: {len(self.frames)}")
             return None  # Or handle accordingly
 
     def draw(self, screen, position):

@@ -2,8 +2,11 @@ import game
 import player
 import pygame
 from ai.ai_env import ai_env
+from enemy import Chicken
+from environment.heart import Heart
 from ai.ai import AI
 from ai.DQNMODEL import DQNMODEL
+from player import Player
 
 class GameAI(game.Game):
     def __init__(self):
@@ -41,16 +44,53 @@ class GameAI(game.Game):
             self.update_game_state()
             self.render_game_state()
             if len(self.enemies) == 0:
-                self.game_over()
+                self.level_finished()
 
-
-            
-    #resets the game/round
     def game_over(self):
+        for enemy in self.enemies.sprites():
+            for chicken in self.all_sprites:
+                if isinstance(chicken, Chicken):
+                    for egg in enemy.eggs[:]:
+                        egg._remove_sprite()
+            enemy._remove_sprite()
+        self.enemies.empty()
+            
+        for laser in self.player.lasers:
+            laser.kill()
+            
+        self.player.kill()
+        self.reset()
+       
+    def reset(self):
+        self.frozen = True 
+        self.frozen_start_time = pygame.time.get_ticks()
+        self.current_round = 1
+        # print(f"All chickens defeated! Starting round {self.current_round}...")
+        self.enemies.empty()
+        self.player = Player(self.screen_width, self.screen_height)
+        self.environment.reassign_player(self.player)
+        
+        self.hearts = []
+        for i in range(self.player.lives):
+            # print(f"Initializing heart {i + 1} at position: ({self.screen_width - (i + 1) * 70}, 20)")
+            try:
+                heart = Heart((self.screen_width - (i + 1) * 70, 20))
+                heart.rect.size = (60, 60)
+                self.hearts.append(heart)
+                self.all_sprites.add(heart)
+                # print(f"Heart {i + 1} initialized successfully.")
+            except KeyError as e:
+                print(f"KeyError while initializing heart {i + 1}: {str(e)}")
+            except Exception as e:
+                print(f"Error while initializing heart {i + 1}: {str(e)}")
+                
+        self.setup_enemy_grid()
+
+     #resets the game/round
+    def level_finished(self):
         # self.score = 0
         # self.player = player.Player(self.screen_width, self.screen_height)
         self.handle_all_chickens_dead()
-
     
     def check_collisions(self):
         for enemy in self.enemies.sprites():
@@ -61,7 +101,7 @@ class GameAI(game.Game):
                         enemy.killChicken()
                         enemy.update(self.screen_width, self.screen_height)
                         self.environment.hit_enemies = 1
-                        self.score += 100
+                        self.player.score += 100
                     break
                 
         for enemy in self.enemies:
@@ -117,3 +157,5 @@ class GameAI(game.Game):
                 if egg.should_disappear():
                     enemy.eggs.remove(egg)  # Remove from enemy's eggs list
                     self.all_sprites.remove(egg)  # Remove from all sprites group
+                
+            
