@@ -98,7 +98,7 @@ class ai_env:
         reward-= 30 * self.player_hit_by_egg
         self.player_hit_by_egg = 0
         if self.player_death:
-            reward -=1000
+            reward -= 1000
         else:
             reward += 250
         reward += self.score * 0.01

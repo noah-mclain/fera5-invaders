@@ -1,7 +1,10 @@
-import pygame
 import random
-from environment.sprite_sheet import SpriteSheet
+
+import pygame
+
 from environment.animation_sequence import AnimationSequence
+from environment.sprite_sheet import SpriteSheet
+
 
 class AnimatedSprite(pygame.sprite.Sprite):
     def __init__(self, position, sprite_sheet_path, sprite_type="chicken", initial_state="alive"):
@@ -112,6 +115,16 @@ class AnimatedSprite(pygame.sprite.Sprite):
                     "scale": 1,
                 },
             },
+            "powerup": {
+                "active": {
+                "width": 58,
+                "height": 71,
+                "frames": [
+                    {"name": f"powerup_frame_{i}", "x": i * 58, "y": 0} for i in range(25)
+                ],
+                "scale": 1
+                }
+            }
         }
         
         data = sprite_data.get(sprite_type)
@@ -131,12 +144,6 @@ class AnimatedSprite(pygame.sprite.Sprite):
                 # Debugging output
                 # print(f"Processing {state} frame data: {frame_data}")
                 try:
-                    # Ensure frame_data is a dictionary
-                    # if isinstance(frame_data, int):
-                    #     raise ValueError(f"Expected frame data to be a dictionary, got int: {frame_data}")
-
-                    # Debugging output to check frame data
-                    # print(f"Processing {state} frame data: {frame_data}")
                     
                     width = frame_data.get("width", state_data["width"])
                     height = frame_data.get("height", state_data["height"])
@@ -180,7 +187,10 @@ class AnimatedSprite(pygame.sprite.Sprite):
             "heart": {
                 "full": {"speed": 0.2},
                 "empty": {"speed": 0.2}
-            }
+            },
+            "powerup": {
+            "active": {"speed": 0.1}
+          }
         }
         
         data = animation_data.get(sprite_type)

@@ -18,6 +18,7 @@ class AI:
         self.alpha = alpha
         self.epsilon = epsilon
         self.model=model
+        
         self.model.compile(optimizer='adam', loss='mse')
         self.decay_rate = 0.02
         self.replay_memory = []
