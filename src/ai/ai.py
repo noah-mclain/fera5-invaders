@@ -23,7 +23,8 @@ class AI:
         self.decay_rate = 0.02
         self.replay_memory = []
         self.memory_capacity = 10000
-        self.batch_size = 32
+        self.batch_size = 128
+        self.min_epsilon = 0.1
     
     
     """retrieves the input nodes from class ai_env"""
@@ -34,9 +35,11 @@ class AI:
     """decides which action to take, exploit or explore, and the espilon's value decreases gradually to increase the probability of exploitation """
     def get_action(self):
         state = self.environment.get_state()
-        state = np.array(state).reshape(1,-1)
+        max_shape = self.environment.input_nodes()
+        states = [np.pad(state, (0, max(0, max_shape - len(state))), constant_values=0)]
 
         probability = np.random.random()
+        print(probability)
 
         if probability <= self.epsilon:
             # implement exploration logic here
@@ -46,11 +49,11 @@ class AI:
         
         else:
             # implement exploitation logic here
-            q_values = self.model.predict(state)
-            actions = self.environment.available_actions()
+            #print("here")
+            q_values = self.model.predict(np.stack(states))
+            actions = self.environment.all_actions()
             action_index = np.argmax(q_values[0])
             action = actions[action_index]
-            
         return action
     
     """
@@ -81,6 +84,8 @@ class AI:
                 q_values[i][mapping[actions[i]]] =  rewards[i] + gamma * next_q_values[max_q_value]
 
         self.model.fit(np.stack(states), np.stack(q_values), verbose = 1)
+        self.update_epsilon()
+
 
         
     # state, action, reward, next_state, done
@@ -93,8 +98,9 @@ class AI:
         
     """decreases the Epsilon's value gradually"""
     def update_epsilon(self):
-        self.epsilon = max(0, self.epsilon - (self.epsilon * self.decay_rate))
-
+        print("function called!")
+        self.epsilon = max(self.min_epsilon, self.epsilon - (self.epsilon * self.decay_rate))
+        print(self.epsilon)
     
     """methods to save and load the trained AI model """
     def save_model(self, file_path):

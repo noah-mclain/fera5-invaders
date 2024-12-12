@@ -25,6 +25,9 @@ class ai_env:
             available_actions.append("left")
         return available_actions
     
+    def all_actions(self):
+        return self.actions
+    
     # performs the current action chosen by the AI 
     def step(self,action): 
         if action=="right":
@@ -89,19 +92,19 @@ class ai_env:
 
     def calculate_reward(self):
         reward=0
-        reward+= 10 * self.hit_enemies
+        reward+= 1 * self.hit_enemies
         self.hit_enemies = 0
-        reward+= 5 * self.eaten_chicken
+        reward+= 1 * self.eaten_chicken
         self.eaten_chicken = 0
-        reward+= 2 * self.egg_hit_by_laser
-        self.egg_hit_by_laser = 0
-        reward-= 30 * self.player_hit_by_egg
+        #reward+= 0.1 * self.egg_hit_by_laser
+        #self.egg_hit_by_laser = 0
+        reward-= 1 * self.player_hit_by_egg
         self.player_hit_by_egg = 0
         if self.player_death:
             reward -= 1000
         else:
-            reward += 250
-        reward += self.score * 0.01
+            reward += 0.2
+        reward += self.score * 0.0001
         return reward
 
     def reassign_player(self, player):
