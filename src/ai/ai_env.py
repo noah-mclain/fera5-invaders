@@ -107,6 +107,7 @@ class ai_env:
         reward += self.score * 0.0001
         return reward
 
+     # create new player
     def reassign_player(self, player):
         self.player = player
 
