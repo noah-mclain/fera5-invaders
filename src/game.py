@@ -240,11 +240,11 @@ class Game:
         # print(f"All chickens defeated! Starting round {self.current_round}...")
 
         # Create a PowerUp and store it
-        self.active_powerup = PowerUp(powerup_type="increment_laser", laser_increment=1)
-        self.active_powerup.rect.center = self.player.rect.center  # Position the power-up
+        self.active_powerup = PowerUp(powerup_type="increment_laser", position=self.player.rect.center, laser_increment=1)
+        self.all_sprites.add(self.active_powerup)
+
         self.setup_enemy_grid()
         self.apply_chicken_flicker_effect()
-        self.player.apply_powerup(self.active_powerup)
         self.all_chickens_dead = False
 
     def apply_chicken_flicker_effect(self):
@@ -347,25 +347,21 @@ class Game:
             if not hasattr(sprite, "image") or not isinstance(sprite.image, pygame.Surface):
                 print(f"Invalid sprite: {sprite}, type: {type(sprite)}")
 
+         # Check if power-up is done animating and apply to player
+        if self.active_powerup and self.active_powerup.isAnimationDone():
+            self.active_powerup.apply_to_player(self.player)
+            self.all_sprites.remove(self.active_powerup)
+            self.active_powerup = None
+
+        # If still frozen, handle freeze logic
         if self.frozen:
-                current_time = pygame.time.get_ticks()
-
-                # Wait for power-up animation and sound to complete
-                if self.active_powerup:
-                    self.active_powerup.update()
-                    if self.active_powerup.animation_done:
-                        self.active_powerup.apply_to_player(self.player)
-                        self.all_sprites.remove(self.active_powerup)
-                        self.active_powerup = None
-
-                # Unfreeze the game after the duration
-                if current_time - self.frozen_start_time > self.freeze_duration:
-                    self.frozen = False
-                    self.round_transitioning = False
-                    self.setup_enemy_grid()
-                return  # Skip other updates while frozenive_powerup)  # Remove from sprite group
-                
-                    
+            current_time = pygame.time.get_ticks()
+            if current_time - self.frozen_start_time > self.freeze_duration:
+                self.frozen = False
+                self.round_transitioning = False
+                self.setup_enemy_grid()
+            return
+                        
         self.all_sprites.draw(self.screen)
                  
     def render_game_state(self):
@@ -380,6 +376,7 @@ class Game:
             
         if self.active_powerup:
             self.active_powerup.draw(self.screen)
+            self.active_powerup.update()
         self.render_scores()
         self.render_xp()
         self.render_round_number()

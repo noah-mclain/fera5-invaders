@@ -15,9 +15,10 @@ class AI:
     """
     def __init__(self, environment, alpha, epsilon, model):
         self.environment = environment
-        self.alpha = alpha
+        self.alpha = alpha 
         self.epsilon = epsilon
         self.model=model
+        
         self.model.compile(optimizer='adam', loss='mse')
         self.decay_rate = 0.005
         self.replay_memory = []
@@ -52,7 +53,7 @@ class AI:
             #print("Exploiting!")
             q_values = self.model.predict(np.stack(state))
             actions = self.environment.all_actions()
-            action_index = np.argmax(q_values[0])
+            action_index = np.argmax(q_values[0]) # noah hatesss wewe
             action = actions[action_index]
         return action
     
@@ -64,7 +65,7 @@ class AI:
             return
         batch = sample(self.replay_memory, self.batch_size)
         states, actions, rewards, next_states, dones = zip(*batch)
-        #states = [np.array(state, dtype=np.float32) for state in states]
+        #states = [np.array(state, dtype=np.float32) for state in states] 
         #next_states = [np.array(next_state, dtype=np.float32) for next_state in next_states]
         q_values = np.array([np.zeros(4, dtype=np.float32) for _ in range(self.batch_size)])
         max_shape = self.environment.input_nodes()

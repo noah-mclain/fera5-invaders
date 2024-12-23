@@ -16,7 +16,8 @@ class DQNMODEL(tf.keras.Model):
         self.dense4 = tf.keras.layers.Dense(16, activation = 'relu')
         self.outputLayer=tf.keras.layers.Dense(num_actions,activation=None)
         
-    """ Overriding DQN'S call function"""    
+    """ Overriding DQN'S call function""" 
+    #pass input from layer to layer   
     def call(self, state):
         x = self.dense1(state)
         x = self.bn1(x)
