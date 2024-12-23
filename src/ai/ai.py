@@ -19,7 +19,7 @@ class AI:
         self.epsilon = epsilon
         self.model=model
         self.model.compile(optimizer='adam', loss='mse')
-        self.decay_rate = 0.02
+        self.decay_rate = 0.005
         self.replay_memory = []
         self.memory_capacity = 10000
         self.batch_size = 128
@@ -35,21 +35,22 @@ class AI:
     def get_action(self):
         state = self.environment.get_state()
         max_shape = self.environment.input_nodes()
-        states = [np.pad(state, (0, max(0, max_shape - len(state))), constant_values=0)]
+        state = [np.pad(state, (0, max(0, max_shape - len(state))), constant_values=0)]
 
         probability = np.random.random()
-        print(probability)
+        #print(probability)
 
         if probability <= self.epsilon:
             # implement exploration logic here
+            #print("Exploring!")
             actions = self.environment.available_actions()
             action = choice(actions)
             #print(action)
         
         else:
             # implement exploitation logic here
-            #print("here")
-            q_values = self.model.predict(np.stack(states))
+            #print("Exploiting!")
+            q_values = self.model.predict(np.stack(state))
             actions = self.environment.all_actions()
             action_index = np.argmax(q_values[0])
             action = actions[action_index]
@@ -84,8 +85,6 @@ class AI:
 
         self.model.fit(np.stack(states), np.stack(q_values), verbose = 1)
         self.update_epsilon()
-
-
         
     # state, action, reward, next_state, done
     """stores the experiences in the replay_memory list"""
@@ -98,7 +97,10 @@ class AI:
     """decreases the Epsilon's value gradually"""
     def update_epsilon(self):
         print("function called!")
-        self.epsilon = max(self.min_epsilon, self.epsilon - (self.epsilon * self.decay_rate))
+        if self.epsilon > 0.5:
+            self.epsilon*=0.99
+        else:
+            self.epsilon = max(self.min_epsilon, self.epsilon - (self.epsilon * self.decay_rate))
         print(self.epsilon)
     
     """methods to save and load the trained AI model """
@@ -107,5 +109,3 @@ class AI:
 
     def load_model(self, file_path):
         self.model.load(file_path)
-
-    

@@ -16,12 +16,14 @@ class GameAI(game.Game):
         self.network = DQNMODEL(num_actions=4)
         self.agent = AI(self.environment, 0.1, 1, self.network)
         self.experience_count = 0
+        self.save_timer = 0
 
     def run(self):
         clock = pygame.time.Clock()
         while self.running:
             clock.tick(60)
             self.experience_count+=1
+            self.save_timer+=1
             action = self.agent.get_action()
             if action == "shoot":
                 action_number = 0
@@ -37,12 +39,15 @@ class GameAI(game.Game):
             self.agent.store_experience(state,action, reward, next_state, done)
             if self.experience_count == 400:
                 self.agent.train(0.7)
-                self.experience_count=0
+                self.experience_count = 0
+            if self.save_timer == 1200:
+                self.agent.save_model('model.keras')
+                self.save_timer = 0
             
 
             self.check_collisions()
             self.update_game_state()
-            self.render_game_state()
+            #self.render_game_state()
             if len(self.enemies) == 0:
                 self.level_finished()
 
@@ -95,6 +100,8 @@ class GameAI(game.Game):
     def check_collisions(self):
         for enemy in self.enemies.sprites():
             for laser in self.player.lasers[:]:
+                if laser.rect.height < 0:
+                    self.missed_laser += 1
                 if laser.rect.colliderect(enemy.rect):
                     if enemy.current_state == "alive":  # Increment score only if alive
                         laser.engage()

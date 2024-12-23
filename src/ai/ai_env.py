@@ -14,6 +14,7 @@ class ai_env:
         self.eaten_chicken = 0
         self.egg_hit_by_laser = 0
         self.player_hit_by_egg = 0
+        self.missed_laser = 0
         self.player_death = False
 
     # returns all possible actions in a given state        
@@ -101,11 +102,15 @@ class ai_env:
         reward-= 1 * self.player_hit_by_egg
         self.player_hit_by_egg = 0
         if self.player_death:
-            reward -=2
-        else:
-            reward += 0.2
-        reward += self.score * 0.0001
+            reward -=10
+        reward-= 0.05*self.missed_laser
+        self.missed_laser = 0
+        #else:
+        #    reward += 0.2
+        #reward += self.score * 0.0001
         return reward
+        
+        
 
     def reassign_player(self, player):
         self.player = player
