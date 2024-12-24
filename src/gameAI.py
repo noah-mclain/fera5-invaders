@@ -14,7 +14,9 @@ class GameAI(game.Game):
         self.environment = ai_env(self)
         self.input_size =self.environment.input_nodes()
         self.network = DQNMODEL(num_actions=4)
+        self.network.build_model(input_shape=(None, self.input_size))
         self.agent = AI(self.environment, 0.1, 1, self.network)
+        self.agent.load_model("model.keras")
         self.experience_count = 0
         self.save_timer = 0
 
@@ -47,7 +49,7 @@ class GameAI(game.Game):
 
             self.check_collisions()
             self.update_game_state()
-            #self.render_game_state()
+            self.render_game_state()
             if len(self.enemies) == 0:
                 self.level_finished()
 

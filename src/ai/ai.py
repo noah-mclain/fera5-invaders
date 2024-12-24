@@ -8,7 +8,6 @@ import numpy as np
 from random import choice
 from random import sample
 
-
 class AI:
     """
     initializing the AI model with its own replay buffer
@@ -17,8 +16,7 @@ class AI:
         self.environment = environment
         self.alpha = alpha 
         self.epsilon = epsilon
-        self.model=model
-        
+        self.model = model
         self.model.compile(optimizer='adam', loss='mse')
         self.decay_rate = 0.005
         self.replay_memory = []
@@ -26,6 +24,12 @@ class AI:
         self.batch_size = 128
         self.min_epsilon = 0.1
     
+        # self.target_model = DQNMODEL(num_actions=self.model.outputLayer.units)
+        # self.target_model.build(input_shape=(None, self.environment.input_nodes()))
+        # self.target_model.set_weights(self.model.get_weights())
+        # self.update_target_every = 1000
+        # self.step_count = 0
+
     
     """retrieves the input nodes from class ai_env"""
     def get_input_layer(self):
@@ -36,7 +40,7 @@ class AI:
     def get_action(self):
         state = self.environment.get_state()
         max_shape = self.environment.input_nodes()
-        state = [np.pad(state, (0, max(0, max_shape - len(state))), constant_values=0)]
+        state = [np.pad(state, (0, max(0, max_shape - len(state))), constant_values=0).astype(np.float32)]
 
         probability = np.random.random()
         #print(probability)
@@ -45,17 +49,16 @@ class AI:
             # implement exploration logic here
             #print("Exploring!")
             actions = self.environment.available_actions()
-            action = choice(actions)
-            #print(action)
-        
+            return choice(actions)
+                #print(action)
+
         else:
             # implement exploitation logic here
             #print("Exploiting!")
             q_values = self.model.predict(np.stack(state))
             actions = self.environment.all_actions()
             action_index = np.argmax(q_values[0]) # noah hatesss wewe
-            action = actions[action_index]
-        return action
+            return actions[action_index]
     
     """
     retrieves past experiences in batches, and uses the Q-values learnt from these experience to adjust the neural network's internal weights using back propagation
@@ -69,8 +72,9 @@ class AI:
         #next_states = [np.array(next_state, dtype=np.float32) for next_state in next_states]
         q_values = np.array([np.zeros(4, dtype=np.float32) for _ in range(self.batch_size)])
         max_shape = self.environment.input_nodes()
+        
         states = [np.pad(array, (0, max(0, max_shape - len(array))), constant_values=0) for array in states]
-        next_states = [np.pad(array, (0, max(0,max_shape - len(array))), constant_values=0) for array in next_states]
+        next_states = [np.pad(array, (0, max(0, max_shape - len(array))), constant_values=0) for array in next_states]
         # print(states)
         #states = np.array(states, dtype=np.float32)
         #next_states = np.array(next_states, dtype=np.float32)
@@ -81,8 +85,8 @@ class AI:
             if dones[i]:
                 q_values[i][mapping[actions[i]]] = rewards[i]
             else:
-                max_q_value = np.max(next_q_values[i])
-                q_values[i][mapping[actions[i]]] =  rewards[i] + gamma * next_q_values[max_q_value]
+                max_q_value = np.argmax(next_q_values[i])
+                q_values[i][mapping[actions[i]]] = rewards[i] + gamma * np.max(next_q_values[i])
 
         self.model.fit(np.stack(states), np.stack(q_values), verbose = 1)
         self.update_epsilon()
@@ -109,4 +113,5 @@ class AI:
         self.model.save(file_path)
 
     def load_model(self, file_path):
-        self.model.load(file_path)
+        self.model.build(input_shape=(None, self.environment.input_nodes()))
+        self.model.load_weights(file_path)

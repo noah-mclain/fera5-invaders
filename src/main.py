@@ -35,7 +35,6 @@ def run_game():
 
     # print("Running menu loop...")
     choice = menu.menu_loop()  # Get user selection from menu
-
     if choice == "start_game":
         # print("Starting the game...")
         game = GameAI()
