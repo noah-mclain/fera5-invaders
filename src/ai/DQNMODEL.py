@@ -20,7 +20,7 @@ class DQNMODEL(tf.keras.Model):
     #pass input from layer to layer   
     def call(self, state: tf.Tensor) -> tf.Tensor:
         x = self.dense1(state)
-        x = self.bn1(x)
+        x = self.bn1(x, training= True)
         x = self.dense2(x)
         x = self.dropout1(x, training=True)
         x = self.dense3(x)
@@ -29,7 +29,7 @@ class DQNMODEL(tf.keras.Model):
         return self.outputLayer(x)
     
     def build_model(self, input_shape):
-        self.build(input_shape)
+        super(DQNMODEL, self).build(input_shape)
         
     """ methods that will save and load the weights that the network will learn"""
     def save_model(self, file_path):

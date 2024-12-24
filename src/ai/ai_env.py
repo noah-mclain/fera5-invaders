@@ -16,7 +16,8 @@ class ai_env:
         self.player_hit_by_egg = 0
         self.missed_laser = 0
         self.player_death = False
-
+        self.previous_position = self.player.rect.x
+        self.no_movement_steps = 0
     # returns all possible actions in a given state        
     def available_actions(self):
         available_actions = ["shoot", "stop"]
@@ -91,27 +92,45 @@ class ai_env:
     
     # to calculate the reward/penalty for each action the AI takes
 
+    
     def calculate_reward(self):
-        reward=0
-        reward+= 1 * self.hit_enemies
+        """Calculates and returns the reward for the current action."""
+        reward = 0
+        reward += 1 * self.hit_enemies
         self.hit_enemies = 0
-        reward+= 1 * self.eaten_chicken
+        reward += 1 * self.eaten_chicken
         self.eaten_chicken = 0
-        #reward+= 0.1 * self.egg_hit_by_laser
-        #self.egg_hit_by_laser = 0
-        reward-= 1 * self.player_hit_by_egg
+        # reward += 0.1 * self.egg_hit_by_laser
+        # self.egg_hit_by_laser = 0
+        reward -= 1 * self.player_hit_by_egg
         self.player_hit_by_egg = 0
         if self.player_death:
-            reward -=10
-        reward-= 0.05*self.missed_laser
+            reward -= 10
+            self.player_death = False  #reset flag
+        reward -= 0.05 * self.missed_laser
         self.missed_laser = 0
-        #else:
-        #    reward += 0.2
-        #reward += self.score * 0.0001
+        
+        #penalty for staying in cornars
+        corner_threshold = 15 
+        if self.player.rect.x < corner_threshold or self.player.rect.x > (self.game.screen_width - corner_threshold):
+            reward -= 0.1  # smol penalty to encourage movement
+        
+        #reward for moving towards the center
+        center_x = self.game.screen_width / 2
+        distance_from_center = abs(self.player.rect.x - center_x)
+        reward += -distance_from_center * 0.001  #encouraging staying near the center
+        
+        #penalty for no movement over multiple steps
+        if self.player.rect.x == self.previous_position:
+            self.no_movement_steps += 1
+            if self.no_movement_steps > 50:
+                reward -= 0.5  #penalty for being stuck
+        else:
+            self.no_movement_steps = 0
+            self.previous_position = self.player.rect.x
+        
         return reward
-        
-        
-
+    
     def reassign_player(self, player):
+        """Reassigns the player object, useful after resetting the game."""
         self.player = player
-

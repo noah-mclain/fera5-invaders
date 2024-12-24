@@ -1,12 +1,10 @@
 from player import Player
 from enemy import Chicken
 from game import Game
-from random import random
+from random import random, choice, sample
 import tensorflow as tf
 import gymnasium as gym
 import numpy as np
-from random import choice
-from random import sample
 
 class AI:
     """
@@ -55,11 +53,11 @@ class AI:
         else:
             # implement exploitation logic here
             #print("Exploiting!")
-            q_values = self.model.predict(np.stack(state))
+            q_values = self.model.predict(np.stack(state), verbose=0)
             actions = self.environment.all_actions()
             action_index = np.argmax(q_values[0]) # noah hatesss wewe
             return actions[action_index]
-    
+        return action
     """
     retrieves past experiences in batches, and uses the Q-values learnt from these experience to adjust the neural network's internal weights using back propagation
     """
