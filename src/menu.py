@@ -79,9 +79,6 @@ class GameMenu:
                 game = GameAI()
                 game.run()
                 break
-            elif choice == "train_ai":
-                # print("Training AI...")
-                break
             elif choice == "options":
                 # print("Opening options...")
                 break
