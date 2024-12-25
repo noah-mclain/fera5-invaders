@@ -22,7 +22,7 @@ class GameMenu:
         self.DARK_BLUE = (0, 0, 128)
         self.PURPLE = (128, 0, 128)
 
-        self.menu_items = ["Start Game", "Play as AI", "Train AI", "Options", "Quit"]
+        self.menu_items = ["Start Game", "Play as AI", "Quit"]
         self.selected_item = 0
 
         self.background_image = pygame.image.load(os.path.join("assets", "images", "background", "galaxy_background.jpg"))
@@ -78,9 +78,6 @@ class GameMenu:
                 # print("You are playing as AI...")
                 game = GameAI()
                 game.run()
-                break
-            elif choice == "options":
-                # print("Opening options...")
                 break
             elif choice == "quit":
                 # print("Exiting the game...")
