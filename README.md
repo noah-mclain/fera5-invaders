@@ -46,3 +46,5 @@ Contributions are welcome! If you’d like to improve the game or AI model, feel
 
 
 ![AI Gameplay](assets/ReadmeMedia/dekwan1.png)
+![AI Gameplay](assets/ReadmeMedia/dekwan2.png)
+![AI Gameplay](assets/ReadmeMedia/dekwan3.png)
