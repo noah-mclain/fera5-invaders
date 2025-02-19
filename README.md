@@ -38,8 +38,8 @@ pip install -r requirements.txt
 python3 src/ai/training.py
 
 ````
-AI Training
+## AI Training
 The AI uses Deep Q-Learning (DQN), a reinforcement learning algorithm, to master the game. It trains by interacting with the environment, storing experiences, and learning from rewards to make smarter decisions over time. The model improves through trial and error, ultimately achieving optimal gameplay strategies.
 
-Contributing
+##Contributing
 Contributions are welcome! If you’d like to improve the game or AI model, feel free to submit a pull request.
