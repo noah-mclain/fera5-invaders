@@ -43,3 +43,6 @@ The AI uses Deep Q-Learning (DQN), a reinforcement learning algorithm, to master
 
 ## Contributing
 Contributions are welcome! If you’d like to improve the game or AI model, feel free to submit a pull request.
+
+
+![AI Gameplay](assets/ReadmeMedia/dekwan1.png)
