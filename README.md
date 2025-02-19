@@ -44,7 +44,8 @@ The AI uses Deep Q-Learning (DQN), a reinforcement learning algorithm, to master
 ## Contributing
 Contributions are welcome! If you’d like to improve the game or AI model, feel free to submit a pull request.
 
+# [🎥 Watch the Video](https://studentaast-my.sharepoint.com/personal/r_saleh17871_student_aast_edu/_layouts/15/stream.aspx?id=%2Fpersonal%2Fr%5Fsaleh17871%5Fstudent%5Faast%5Fedu%2FDocuments%2FFera5InvadersMedia%2FVID%2D20250219%2DWA0018%2Emp4&referrer=StreamWebApp%2EWeb&referrerScenario=AddressBarCopied%2Eview%2E83232534%2Dd553%2D4b26%2Dabf2%2De2289b92e64b)
+
 
 ![AI Gameplay](assets/ReadmeMedia/dekwan1.png)
-![AI Gameplay](assets/ReadmeMedia/dekwan2.png)
 ![AI Gameplay](assets/ReadmeMedia/dekwan3.png)
