@@ -20,7 +20,7 @@ class ai_env:
         self.no_movement_steps = 0
     # returns all possible actions in a given state        
     def available_actions(self):
-        available_actions = ["shoot", "stop"]
+        available_actions = ["shoot"]
         if self.player.rect.x < self.game.screen_width:
             available_actions.append("right")
         if self.player.rect.x > 0:
@@ -34,6 +34,7 @@ class ai_env:
     def step(self,action): 
         if action=="right":
             self.player.move(3.7)
+            print()
         elif action=="left":
             self.player.move(-3.7)
         elif action=="shoot":
@@ -124,7 +125,7 @@ class ai_env:
         if self.player.rect.x == self.previous_position:
             self.no_movement_steps += 1
             if self.no_movement_steps > 50:
-                reward -= 0.5  #penalty for being stuck
+                reward -= 10  #penalty for being stuck
         else:
             self.no_movement_steps = 0
             self.previous_position = self.player.rect.x

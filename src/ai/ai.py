@@ -3,7 +3,7 @@ from enemy import Chicken
 from game import Game
 from random import random, choice, sample
 import tensorflow as tf
-import gymnasium as gym
+#import gymnasium as gym
 import numpy as np
 
 class AI:
